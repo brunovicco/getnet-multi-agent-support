@@ -8,6 +8,11 @@ independent layers:
 * an optional LLM classifier that generalizes to unseen paraphrases, and which never overrides a
   safety guardrail decision.
 
+The classifier is a tie-breaker, not the hot path. A first live run showed 3.36 s of routing
+latency paid on every message, including the ones the rules already answer with high confidence.
+Consulting the model only when the rules are uncertain keeps p50 in milliseconds and spends the
+provider budget exclusively on the ambiguous tail.
+
 The rule layer supports token-prefix patterns (``conect*``) and co-occurrence groups (``all_of``)
 so that a device word plus a fault word routes to support even when the exact sentence was never
 anticipated. Phrase-sized rules alone do not survive paraphrase or translation.
@@ -15,10 +20,11 @@ anticipated. Phrase-sized rules alone do not survive paraphrase or translation.
 
 import re
 import unicodedata
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
+from time import perf_counter
 
 from getnet_support.application.ports import IntentClassifierPort
-from getnet_support.domain.models import AgentName, RouteDecision
+from getnet_support.domain.models import AgentName, DecisionSource, RouteDecision
 
 # A message is executed as an agent sequence only when it carries a customer-specific incident
 # AND a public product topic ("my terminal is offline and how does antecipacao work?"). Score
@@ -461,32 +467,79 @@ ROUTING_RULES: tuple[IntentRule, ...] = (
 )
 
 
+# The classifier is consulted only below this rule confidence. Above it the deterministic layer
+# already has a well-supported decision, and paying provider latency to re-derive it is waste.
+CLASSIFIER_CONSULT_BELOW_CONFIDENCE = 0.75
+# A classifier answer this uncertain is worse evidence than the rule decision it would replace, so
+# the rule decision is kept. Escalation is exempt: an uncertain "stop" is still a valid stop.
+MINIMUM_CLASSIFIER_CONFIDENCE = 0.60
+
+
 class RouterAgent:
-    """Route messages through explicit rules, with an optional LLM classifier on top."""
+    """Route messages through explicit rules, using an optional LLM classifier as a tie-breaker."""
 
     def __init__(
         self,
         rules: tuple[IntentRule, ...] = ROUTING_RULES,
         classifier: IntentClassifierPort | None = None,
+        consult_below_confidence: float = CLASSIFIER_CONSULT_BELOW_CONFIDENCE,
     ) -> None:
         """Use the default centralized rules, an injected evaluation set, and a classifier."""
         self._rules = rules
         self._classifier = classifier
+        self._consult_below_confidence = consult_below_confidence
 
     async def route(self, message: str) -> RouteDecision:
-        """Return the route, delegating to the classifier only when no guardrail fired."""
+        """Return the route, consulting the classifier only when the rules are uncertain."""
         rule_decision = self.route_with_rules(message)
-        if self._classifier is None or rule_decision.guardrail:
+        if not self._should_consult_classifier(rule_decision):
             return rule_decision
-        classified = await self._classifier.classify(message)
+
+        started = perf_counter()
+        classified = await self._classifier.classify(message)  # type: ignore[union-attr]
+        latency_ms = round((perf_counter() - started) * 1000, 2)
+
         if classified is None:
-            return rule_decision
+            # A provider failure is not an error for the caller, but it must be visible: this is
+            # the difference between "classifier disabled" and "classifier silently broken".
+            return replace(
+                rule_decision,
+                source=DecisionSource.CLASSIFIER_FAILED,
+                classifier_latency_ms=latency_ms,
+            )
+        if not self._is_usable(classified):
+            return replace(
+                rule_decision,
+                source=DecisionSource.CLASSIFIER_LOW_CONFIDENCE,
+                classifier_latency_ms=latency_ms,
+            )
         return RouteDecision(
             agent=classified.agent,
             reason=f"LLM classifier: {classified.reason}",
             confidence=classified.confidence,
             secondary_agent=classified.secondary_agent or rule_decision.secondary_agent,
+            source=DecisionSource.CLASSIFIER,
+            classifier_latency_ms=latency_ms,
         )
+
+    def _should_consult_classifier(self, rule_decision: RouteDecision) -> bool:
+        """Spend provider latency only on the ambiguous tail, never on guardrails."""
+        if self._classifier is None or rule_decision.guardrail:
+            return False
+        return rule_decision.confidence < self._consult_below_confidence
+
+    @staticmethod
+    def _is_usable(classified: RouteDecision) -> bool:
+        """Reject a classifier answer too uncertain to displace the deterministic decision.
+
+        The two layers do not share a confidence scale: the rule score is accumulated signal
+        weight, while the classifier reports its own certainty. Escalation is accepted at any
+        confidence because an uncertain refusal is still safe; an uncertain positive routing
+        decision is not.
+        """
+        if classified.agent is AgentName.ESCALATION:
+            return True
+        return classified.confidence >= MINIMUM_CLASSIFIER_CONFIDENCE
 
     def route_with_rules(self, message: str) -> RouteDecision:
         """Return the deterministic decision used as default and as classifier fallback."""

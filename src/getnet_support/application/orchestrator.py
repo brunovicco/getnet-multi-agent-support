@@ -57,6 +57,9 @@ class SupportOrchestrator:
                 ),
                 "confidence": decision.confidence,
                 "guardrail": decision.guardrail,
+                # Provenance makes the classifier fallback rate a metric instead of a mystery.
+                "decision_source": decision.source.value,
+                "classifier_latency_ms": decision.classifier_latency_ms,
                 "reason": decision.reason,
             },
         )

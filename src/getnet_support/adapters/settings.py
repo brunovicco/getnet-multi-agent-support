@@ -20,7 +20,10 @@ class Settings(BaseSettings):
     llm_timeout_seconds: float = 20.0
     # Opt-in: use the model as the primary router, keeping rules as the fallback.
     llm_router_enabled: bool = False
-    llm_router_timeout_seconds: float = 10.0
+    # Routing sits on the chat request path, so its budget is much tighter than generation's:
+    # exceeding it must cost a fallback to rules, not a slow response.
+    llm_router_timeout_seconds: float = 2.0
+    llm_router_reasoning_effort: str = "none"
     web_search_provider: str = ""
     web_search_api_key: str = ""
     web_search_base_url: str = "https://api.tavily.com"
