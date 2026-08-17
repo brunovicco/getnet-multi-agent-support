@@ -24,6 +24,20 @@ class RouteName(StrEnum):
     AGENT_SEQUENCE = "agent_sequence"
 
 
+class DecisionSource(StrEnum):
+    """Which routing layer produced a decision.
+
+    Without this, "the classifier is disabled" and "the classifier is broken" produce identical
+    logs, so the fallback rate cannot be measured and a silent provider outage looks like normal
+    deterministic operation.
+    """
+
+    RULES = "rules"
+    CLASSIFIER = "classifier"
+    CLASSIFIER_FAILED = "classifier_failed"
+    CLASSIFIER_LOW_CONFIDENCE = "classifier_low_confidence"
+
+
 @dataclass(frozen=True, slots=True)
 class RouteDecision:
     """Typed output produced by the router."""
@@ -33,6 +47,8 @@ class RouteDecision:
     confidence: float
     secondary_agent: AgentName | None = None
     guardrail: bool = False
+    source: DecisionSource = DecisionSource.RULES
+    classifier_latency_ms: float | None = None
 
     def __post_init__(self) -> None:
         """Reject invalid confidence values at the domain boundary."""

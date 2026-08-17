@@ -122,3 +122,17 @@ async def test_unknown_customer_is_handed_off_without_disclosure() -> None:
 
     assert result.handoff_required is True
     assert "GET-12345" not in result.answer
+
+
+@pytest.mark.asyncio
+async def test_router_event_carries_decision_provenance() -> None:
+    """REQ-O1: a disabled classifier and a broken one must not look identical in the logs."""
+    events = RecordingEvents()
+
+    await build_orchestrator(events).chat(
+        message="minha maquininha não conecta", user_id="cliente1988"
+    )
+
+    fields = next(fields for event, fields in events.events if event == "router_decision")
+    assert fields["decision_source"] == "rules"
+    assert fields["classifier_latency_ms"] is None

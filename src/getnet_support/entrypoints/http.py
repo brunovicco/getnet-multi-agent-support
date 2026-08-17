@@ -65,6 +65,7 @@ def build_orchestrator(settings: Settings) -> SupportOrchestrator:
             model=settings.llm_model,
             base_url=settings.llm_base_url,
             timeout_seconds=settings.llm_router_timeout_seconds,
+            reasoning_effort=settings.llm_router_reasoning_effort,
         )
         if settings.llm_router_enabled
         and settings.llm_provider.casefold() == "openai"

@@ -28,6 +28,8 @@ labelled data rather than judgement:
 | Constant | Value | Calibrate with |
 | --- | --- | --- |
 | `ROUTING_CONFIDENCE_THRESHOLD` | 0.60 | escalation-rate versus routing-error curve on the routing dataset |
+| `CLASSIFIER_CONSULT_BELOW_CONFIDENCE` | 0.75 | share of traffic sent to the provider versus routing accuracy gained |
+| `MINIMUM_CLASSIFIER_CONFIDENCE` | 0.60 | accuracy of classifier answers by reported confidence bucket |
 | `MINIMUM_RETRIEVAL_SCORE` | 0.08 (noise floor) | precision@1 on a labelled query→source set |
 | `MINIMUM_TERM_COVERAGE` | 0.20 | groundedness versus unnecessary-escalation trade-off |
 | `CURATED_PREFERENCE_RATIO` | 0.65 | answer-quality review of curated versus scraped selections |
@@ -54,6 +56,11 @@ already asserted in tests), fact consistency with tool output, automated-resolut
 appropriate-handoff rate.
 
 ## Operational metrics
+
+Routing specifically: classifier consult rate (share of messages below the consult threshold),
+classifier fallback rate split by cause via `decision_source`, and classifier latency as its own
+series — routing sits on the request path, so a provider slowdown shows up as p95 chat latency
+before it shows up anywhere else.
 
 p50/p95/p99 end-to-end and per-tool latency; error, timeout, and tool-failure rates; escalation
 rate split by cause (guardrail, low confidence, insufficient evidence, unknown user); retrieval

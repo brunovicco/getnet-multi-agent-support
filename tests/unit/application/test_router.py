@@ -6,7 +6,7 @@ from getnet_support.application.agents.router import (
     phrase_matches,
     tokenize_message,
 )
-from getnet_support.domain.models import AgentName, RouteDecision
+from getnet_support.domain.models import AgentName, DecisionSource, RouteDecision
 
 ENGLISH_CHALLENGE_SCENARIOS = [
     ("What's the difference between the Get Clássica and the Get Smart?", AgentName.KNOWLEDGE),
@@ -126,24 +126,75 @@ class StubClassifier:
         return self.decision
 
 
+AMBIGUOUS_MESSAGE = "preciso resolver uma coisa aqui"
+CONFIDENT_MESSAGE = "minha maquininha não conecta"
+
+
+def test_the_ambiguous_message_is_below_the_consult_threshold() -> None:
+    """Guards the premise of the tie-breaker tests below."""
+    assert RouterAgent().route_with_rules(AMBIGUOUS_MESSAGE).confidence < 0.75
+    assert RouterAgent().route_with_rules(CONFIDENT_MESSAGE).confidence >= 0.75
+
+
 @pytest.mark.asyncio
-async def test_classifier_result_overrides_rules_when_available() -> None:
+async def test_a_confident_rule_decision_never_pays_provider_latency() -> None:
+    """REQ-R4: the classifier is a tie-breaker, not the hot path."""
+    classifier = StubClassifier(RouteDecision(AgentName.KNOWLEDGE, "product question", 0.99))
+
+    decision = await RouterAgent(classifier=classifier).route(CONFIDENT_MESSAGE)
+
+    assert classifier.calls == 0
+    assert decision.agent is AgentName.SUPPORT
+    assert decision.source is DecisionSource.RULES
+    assert decision.classifier_latency_ms is None
+
+
+@pytest.mark.asyncio
+async def test_classifier_breaks_the_tie_when_rules_are_uncertain() -> None:
     classifier = StubClassifier(RouteDecision(AgentName.SUPPORT, "customer incident", 0.91))
 
-    decision = await RouterAgent(classifier=classifier).route("algo muito ambíguo")
-
-    assert decision.agent is AgentName.SUPPORT
-    assert decision.confidence == 0.91
-
-
-@pytest.mark.asyncio
-async def test_rules_are_used_when_the_classifier_fails() -> None:
-    classifier = StubClassifier(None)
-
-    decision = await RouterAgent(classifier=classifier).route("minha maquininha não conecta")
+    decision = await RouterAgent(classifier=classifier).route(AMBIGUOUS_MESSAGE)
 
     assert classifier.calls == 1
     assert decision.agent is AgentName.SUPPORT
+    assert decision.confidence == 0.91
+    assert decision.source is DecisionSource.CLASSIFIER
+    assert decision.classifier_latency_ms is not None
+
+
+@pytest.mark.asyncio
+async def test_provider_failure_falls_back_to_rules_and_stays_observable() -> None:
+    classifier = StubClassifier(None)
+
+    decision = await RouterAgent(classifier=classifier).route(AMBIGUOUS_MESSAGE)
+
+    assert classifier.calls == 1
+    assert decision.agent is RouterAgent().route_with_rules(AMBIGUOUS_MESSAGE).agent
+    # A silent fallback is the failure mode this field exists to expose.
+    assert decision.source is DecisionSource.CLASSIFIER_FAILED
+    assert decision.classifier_latency_ms is not None
+
+
+@pytest.mark.asyncio
+async def test_an_uncertain_positive_classification_does_not_displace_the_rules() -> None:
+    """The two layers do not share a confidence scale, so a weak answer is not better evidence."""
+    classifier = StubClassifier(RouteDecision(AgentName.SUPPORT, "maybe an incident", 0.4))
+
+    decision = await RouterAgent(classifier=classifier).route(AMBIGUOUS_MESSAGE)
+
+    assert decision.agent is RouterAgent().route_with_rules(AMBIGUOUS_MESSAGE).agent
+    assert decision.source is DecisionSource.CLASSIFIER_LOW_CONFIDENCE
+
+
+@pytest.mark.asyncio
+async def test_an_uncertain_escalation_is_still_honoured() -> None:
+    """An uncertain refusal is safe; an uncertain positive routing decision is not."""
+    classifier = StubClassifier(RouteDecision(AgentName.ESCALATION, "out of scope", 0.3))
+
+    decision = await RouterAgent(classifier=classifier).route(AMBIGUOUS_MESSAGE)
+
+    assert decision.agent is AgentName.ESCALATION
+    assert decision.source is DecisionSource.CLASSIFIER
 
 
 @pytest.mark.asyncio
