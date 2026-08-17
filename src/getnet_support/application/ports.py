@@ -6,6 +6,7 @@ from typing import Protocol
 from getnet_support.domain.models import (
     CustomerProfile,
     RetrievalResult,
+    RetrievedChunk,
     TerminalStatus,
     Transaction,
     WebSearchResult,
@@ -25,6 +26,14 @@ class WebSearchPort(Protocol):
 
     async def search(self, query: str) -> WebSearchResult:
         """Return a grounded answer, or an explicit unavailable result."""
+        ...
+
+
+class AnswerGeneratorPort(Protocol):
+    """Generate a response from already-retrieved Getnet evidence."""
+
+    async def generate(self, query: str, evidence: tuple[RetrievedChunk, ...]) -> str | None:
+        """Return a grounded answer, or ``None`` so the caller uses its local fallback."""
         ...
 
 

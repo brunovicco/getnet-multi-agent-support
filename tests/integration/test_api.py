@@ -1,6 +1,10 @@
+from pathlib import Path
+
 from fastapi.testclient import TestClient
 
+from getnet_support.adapters.rag.corpus_store import save_corpus
 from getnet_support.adapters.settings import Settings
+from getnet_support.domain.models import KnowledgeChunk
 from getnet_support.entrypoints.http import create_app
 
 
@@ -37,7 +41,53 @@ def test_health_reports_local_capabilities() -> None:
         "service": "getnet-multi-agent-support",
         "rag": "ready",
         "web_search": "unavailable",
+        "answer_generation": "extractive",
     }
+
+
+def test_health_reports_configured_optional_providers_without_calling_them() -> None:
+    settings = Settings(
+        web_search_provider="tavily",
+        web_search_api_key="test-web-key",
+        llm_provider="openai",
+        llm_api_key="test-llm-key",
+    )
+    with TestClient(create_app(settings)) as client:
+        response = client.get("/health")
+
+    assert response.json()["web_search"] == "configured"
+    assert response.json()["answer_generation"] == "openai"
+
+
+def test_chat_loads_the_configured_local_corpus(tmp_path: Path) -> None:
+    artifact = tmp_path / "custom-corpus.json"
+    save_corpus(
+        artifact,
+        (
+            KnowledgeChunk(
+                title="Challenge-only Getnet capability",
+                source="https://getnet.test/quantum-checkout",
+                text=(
+                    "Getnet Quantum Checkout is a challenge-only test capability identified by "
+                    "the code QX-4242."
+                ),
+            ),
+        ),
+    )
+    with TestClient(create_app(Settings(getnet_corpus_path=artifact))) as client:
+        response = client.post(
+            "/chat",
+            json={
+                "message": "Can Getnet Quantum Checkout use code QX-4242?",
+                "user_id": "cliente1988",
+            },
+        )
+
+    body = response.json()
+    assert response.status_code == 200
+    assert body["route"] == "getnet_rag"
+    assert "QX-4242" in body["answer"]
+    assert body["sources"][0]["url"] == "https://getnet.test/quantum-checkout"
 
 
 def test_chat_routes_support_request() -> None:

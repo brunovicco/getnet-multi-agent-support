@@ -9,7 +9,17 @@ from getnet_support.adapters.tools.transactions import RecentTransactionsTool
 from getnet_support.adapters.tools.web_search import WebSearchTool
 from getnet_support.application.agents.customer_support import CustomerSupportAgent
 from getnet_support.application.agents.knowledge import KnowledgeAgent
-from getnet_support.domain.models import AgentName, RouteName
+from getnet_support.domain.models import AgentName, RetrievedChunk, RouteName
+
+
+class StubAnswerGenerator:
+    def __init__(self, answer: str | None) -> None:
+        self._answer = answer
+
+    async def generate(self, query: str, evidence: tuple[RetrievedChunk, ...]) -> str | None:
+        assert query
+        assert evidence
+        return self._answer
 
 
 def build_support_agent() -> CustomerSupportAgent:
@@ -57,6 +67,36 @@ async def test_knowledge_agent_degrades_without_web_provider() -> None:
     assert result.route is RouteName.WEB_SEARCH
     assert result.sources == ()
     assert "requires a configured" in result.answer
+
+
+@pytest.mark.asyncio
+async def test_knowledge_agent_uses_optional_grounded_generator() -> None:
+    agent = KnowledgeAgent(
+        LocalTfidfRetriever(DEFAULT_GETNET_CORPUS),
+        WebSearchTool(),
+        StubAnswerGenerator("A generated answer based only on the retrieved evidence."),
+    )
+
+    result = await agent.handle("Can I share a Getnet Payment Link through WhatsApp?")
+
+    assert result.answer == "A generated answer based only on the retrieved evidence."
+    assert result.sources[0].title == "Getnet Payment Link"
+    assert result.tool_calls == 2
+
+
+@pytest.mark.asyncio
+async def test_knowledge_agent_keeps_extractive_fallback_when_generation_fails() -> None:
+    agent = KnowledgeAgent(
+        LocalTfidfRetriever(DEFAULT_GETNET_CORPUS),
+        WebSearchTool(),
+        StubAnswerGenerator(None),
+    )
+
+    result = await agent.handle("Can I share a Getnet Payment Link through WhatsApp?")
+
+    assert result.answer.startswith("Based on the indexed Getnet sources:")
+    assert result.sources[0].title == "Getnet Payment Link"
+    assert result.tool_calls == 2
 
 
 @pytest.mark.asyncio

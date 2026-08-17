@@ -70,4 +70,5 @@ class HealthResponse(BaseModel):
     status: Literal["ok"] = "ok"
     service: str
     rag: Literal["ready"] = "ready"
-    web_search: Literal["unavailable"] = "unavailable"
+    web_search: Literal["configured", "unavailable"]
+    answer_generation: Literal["openai", "extractive"]

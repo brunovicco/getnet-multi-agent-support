@@ -6,7 +6,9 @@ from fastapi import FastAPI, Response
 
 from getnet_support import __version__
 from getnet_support.adapters.events import StructlogEventSink
+from getnet_support.adapters.generation import OpenAIResponsesGenerator
 from getnet_support.adapters.rag.corpus import DEFAULT_GETNET_CORPUS
+from getnet_support.adapters.rag.corpus_store import load_corpus_or_fallback
 from getnet_support.adapters.rag.retriever import LocalTfidfRetriever
 from getnet_support.adapters.repositories.fake_customer_repository import FakeCustomerRepository
 from getnet_support.adapters.settings import Settings
@@ -35,12 +37,26 @@ from getnet_support.entrypoints.models import (
 def build_orchestrator(settings: Settings) -> SupportOrchestrator:
     """Wire concrete adapters to framework-free application ports."""
     repository = FakeCustomerRepository()
+    corpus = load_corpus_or_fallback(settings.getnet_corpus_path, DEFAULT_GETNET_CORPUS)
+    answer_generator = (
+        OpenAIResponsesGenerator(
+            api_key=settings.llm_api_key,
+            model=settings.llm_model,
+            base_url=settings.llm_base_url,
+            timeout_seconds=settings.llm_timeout_seconds,
+        )
+        if settings.llm_provider.casefold() == "openai" and settings.llm_api_key
+        else None
+    )
     knowledge = KnowledgeAgent(
-        LocalTfidfRetriever(DEFAULT_GETNET_CORPUS),
+        LocalTfidfRetriever(corpus),
         WebSearchTool(
             provider=settings.web_search_provider,
             api_key=settings.web_search_api_key,
+            base_url=settings.web_search_base_url,
+            timeout_seconds=settings.web_search_timeout_seconds,
         ),
+        answer_generator,
     )
     support = CustomerSupportAgent(
         CustomerProfileTool(repository),
@@ -86,6 +102,18 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     async def health() -> HealthResponse:
         return HealthResponse(
             service=resolved_settings.service_name,
+            web_search=(
+                "configured"
+                if resolved_settings.web_search_provider.casefold() == "tavily"
+                and resolved_settings.web_search_api_key
+                else "unavailable"
+            ),
+            answer_generation=(
+                "openai"
+                if resolved_settings.llm_provider.casefold() == "openai"
+                and resolved_settings.llm_api_key
+                else "extractive"
+            ),
         )
 
     @application.post("/chat", response_model=ChatResponse)

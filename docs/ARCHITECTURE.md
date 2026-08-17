@@ -3,9 +3,10 @@
 ## Context
 
 The service answers public Getnet product questions, current general-information questions, and a
-small set of authenticated customer-support diagnostics. Its current downstreams are a local
-Getnet index and fake customer repository. Production adapters would integrate search, CRM,
-payments, settlement, and terminal systems.
+small set of authenticated customer-support diagnostics. Its current downstreams are a persisted
+local Getnet index, optional Tavily search, optional OpenAI Responses generation, and a fake
+customer repository. Production adapters would replace the fake CRM, payments, settlement, and
+terminal systems.
 
 ## Layers
 
@@ -25,14 +26,15 @@ and terminal status. Monetary values use `Decimal`; timestamps are timezone-awar
 ### Application
 
 `SupportOrchestrator` is the chat use case. It calls `RouterAgent` and exactly one specialized
-agent. Protocol ports keep retrieval, search, customer data, and events replaceable. There is no
-implicit global agent state.
+agent. Protocol ports keep retrieval, search, answer generation, customer data, and events
+replaceable. There is no implicit global agent state.
 
 ### Adapters
 
-The local TF-IDF retriever, bounded HTML ingestor, fake repository, scoped tools, settings, and
-structured event sink implement application ports. Optional OpenTelemetry and Langfuse adapters
-remain failure-isolated and disabled without configuration.
+The validated JSON corpus store, local TF-IDF retriever, bounded HTML ingestor, Tavily web search,
+OpenAI Responses generator, fake repository, scoped tools, settings, and structured event sink
+implement application ports. Provider calls are timeout-bounded and failure-isolated. Optional
+OpenTelemetry and Langfuse adapters remain disabled without configuration.
 
 ### Entrypoints
 
@@ -60,6 +62,10 @@ sequenceDiagram
         O->>S: handle typed input
         S->>T: typed tool call
         T-->>S: grounded/scoped data
+        opt Getnet evidence and OpenAI configured
+            S->>T: generate(question, retrieved evidence)
+            T-->>S: grounded answer or local fallback
+        end
     end
     S-->>O: AgentResult
     O-->>A: ChatResult
