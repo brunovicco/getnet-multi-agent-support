@@ -144,6 +144,15 @@ terminal status is resolved only after loading that same user's assigned termina
 
 ## API
 
+### Service index
+
+```bash
+curl http://localhost:8000/
+```
+
+`GET /` returns the service version and links to `/docs`, `/health`, and `/chat`. Browsers may also
+request `/favicon.ico`; the API returns `204 No Content` to avoid misleading not-found noise.
+
 ### Health
 
 ```bash
@@ -244,6 +253,11 @@ Each request gets a trace ID. JSON `structlog` events include:
 - latency in milliseconds;
 - tool-call and retrieval-result counts;
 - handoff state and errors at infrastructure boundaries.
+
+Raw `user_id` values are never emitted. A namespaced SHA-256 digest produces a short, stable
+`user_reference_hash` for correlating a customer's events without exposing their identifier. This
+is pseudonymization rather than anonymization, so the hash still receives the same access and
+retention protections as other operational metadata.
 
 Prompts, answers, secrets, and customer record contents are not logged. The harness includes a
 failure-isolated optional OpenTelemetry adapter. A production path is:

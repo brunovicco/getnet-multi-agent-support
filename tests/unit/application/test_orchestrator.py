@@ -70,3 +70,11 @@ async def test_orchestration_paths(message: str, agent: AgentName, route: RouteN
     assert result.route is route
     assert result.trace_id == "trace-123"
     assert [event for event, _ in events.events] == ["router_decision", "agent_execution"]
+    event_fields = [fields for _, fields in events.events]
+    assert all("user_id" not in fields for fields in event_fields)
+    references = {fields["user_reference_hash"] for fields in event_fields}
+    assert len(references) == 1
+    reference = next(iter(references))
+    assert isinstance(reference, str)
+    assert reference.startswith("usr_")
+    assert all("cliente1988" not in str(fields) for fields in event_fields)

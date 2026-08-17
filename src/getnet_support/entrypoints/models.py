@@ -7,6 +7,17 @@ from pydantic import BaseModel, ConfigDict, Field
 from getnet_support.domain.models import ChatResult, Source
 
 
+class ServiceIndexResponse(BaseModel):
+    """Discoverable service entrypoint returned by ``GET /``."""
+
+    status: Literal["ok"] = "ok"
+    service: str
+    version: str
+    documentation: Literal["/docs"] = "/docs"
+    health: Literal["/health"] = "/health"
+    chat: Literal["/chat"] = "/chat"
+
+
 class ChatRequest(BaseModel):
     """Validated input accepted by ``POST /chat``."""
 

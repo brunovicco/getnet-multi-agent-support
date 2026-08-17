@@ -79,7 +79,8 @@ This is enforced by `scripts/validate_architecture.py` in the harness quality ga
 ## Cross-cutting decisions
 
 - Configuration: environment variables validated by Pydantic settings.
-- Logging: metadata-only JSON events with request trace IDs.
+- Logging: metadata-only JSON events with request trace IDs and pseudonymous user references;
+  raw `user_id` values are never emitted.
 - Tracing: optional OpenTelemetry over OTLP HTTP/protobuf; disabled by default.
 - Errors: external ingestion failures are isolated; unsupported business requests escalate.
 - Time: timezone-aware UTC internally.

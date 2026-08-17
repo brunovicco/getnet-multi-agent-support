@@ -2,7 +2,7 @@
 
 from uuid import uuid4
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 
 from getnet_support import __version__
 from getnet_support.adapters.events import StructlogEventSink
@@ -24,7 +24,12 @@ from getnet_support.entrypoints.logging import (
     clear_request_context,
     configure_logging,
 )
-from getnet_support.entrypoints.models import ChatRequest, ChatResponse, HealthResponse
+from getnet_support.entrypoints.models import (
+    ChatRequest,
+    ChatResponse,
+    HealthResponse,
+    ServiceIndexResponse,
+)
 
 
 def build_orchestrator(settings: Settings) -> SupportOrchestrator:
@@ -65,6 +70,17 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         version=__version__,
         description="Explicitly orchestrated support agents with grounded local RAG.",
     )
+
+    @application.get("/", response_model=ServiceIndexResponse)
+    async def index() -> ServiceIndexResponse:
+        return ServiceIndexResponse(
+            service=resolved_settings.service_name,
+            version=__version__,
+        )
+
+    @application.get("/favicon.ico", include_in_schema=False, status_code=204)
+    async def favicon() -> Response:
+        return Response(status_code=204)
 
     @application.get("/health", response_model=HealthResponse)
     async def health() -> HealthResponse:

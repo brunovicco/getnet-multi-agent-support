@@ -1,5 +1,6 @@
 """Explicit multi-agent orchestration use case."""
 
+from hashlib import sha256
 from time import perf_counter
 from uuid import uuid4
 
@@ -11,6 +12,14 @@ from getnet_support.application.ports import EventSink
 from getnet_support.domain.models import AgentName, ChatResult
 
 ROUTING_CONFIDENCE_THRESHOLD = 0.60
+_USER_REFERENCE_NAMESPACE = "getnet-multi-agent-support"
+
+
+def pseudonymize_user_id(user_id: str) -> str:
+    """Return a stable pseudonymous log reference instead of the raw identifier."""
+    namespaced_value = f"{_USER_REFERENCE_NAMESPACE}:{user_id}"
+    digest = sha256(namespaced_value.encode()).hexdigest()[:16]
+    return f"usr_{digest}"
 
 
 class SupportOrchestrator:
@@ -34,13 +43,14 @@ class SupportOrchestrator:
     async def chat(self, *, message: str, user_id: str, trace_id: str | None = None) -> ChatResult:
         """Route and execute a message through exactly one specialized agent."""
         request_trace_id = trace_id or uuid4().hex
+        user_reference_hash = pseudonymize_user_id(user_id)
         started = perf_counter()
         decision = self._router.route(message)
         self._events.emit(
             "router_decision",
             {
                 "trace_id": request_trace_id,
-                "user_id": user_id,
+                "user_reference_hash": user_reference_hash,
                 "selected_agent": decision.agent.value,
                 "confidence": decision.confidence,
                 "reason": decision.reason,
@@ -61,7 +71,7 @@ class SupportOrchestrator:
             "agent_execution",
             {
                 "trace_id": request_trace_id,
-                "user_id": user_id,
+                "user_reference_hash": user_reference_hash,
                 "agent": result.agent.value,
                 "route": result.route.value,
                 "latency_ms": latency_ms,
