@@ -217,7 +217,8 @@ uv run uvicorn getnet_support.entrypoints.http:app --host 0.0.0.0 --port 8000
 ```
 
 The observability extra is needed only because the harness includes OpenTelemetry adapter tests.
-The API runtime itself remains network-silent when no OTLP endpoint is configured.
+With no provider credentials and no OTLP endpoint configured, the API runtime remains
+network-silent.
 
 ### Optional live providers
 
@@ -281,8 +282,9 @@ the complete HTML -> chunks -> JSON artifact -> index -> retrieval -> grounded r
 - Optional OpenAI generation constrained to retrieved evidence, with an extractive fallback.
 - Low-confidence and missing-grounding escalation.
 - Customer facts originate only from scoped tools; no invented balances, sales, or terminal state.
-- Explicit HTTP timeouts and failure isolation in offline ingestion.
-- Application startup and core chat paths require no network service.
+- Explicit HTTP timeouts and failure isolation in out-of-band ingestion.
+- Application startup performs no provider calls; credential-free chat paths remain
+  network-silent.
 
 ## Observability
 
@@ -362,11 +364,12 @@ traffic should feed privacy-safe online aggregates and sampled, access-controlle
 
 - Authenticate requests and bind `user_id` to authorization claims.
 - Replace fake tools with resilient CRM, payments, settlement, and terminal API adapters.
-- Add a maintained search-provider adapter with result provenance and content safety checks.
+- Harden the Tavily integration with domain allowlists, result-content safety checks, caching,
+  retries, and a secondary provider strategy.
 - Move reviewed documents to a managed embedding pipeline and vector database with freshness,
   deduplication, access controls, and deletion policies.
-- Put LLM access behind a model gateway with schema-constrained outputs, budgets, timeouts, and
-  deterministic fallbacks.
+- Route the existing optional OpenAI generation through a model gateway with schema-constrained
+  outputs, centralized budgets, policy enforcement, and provider failover.
 - Add rate limiting, abuse controls, PII classification/redaction, a secrets manager, dependency
   scanning, and prompt-injection evaluations.
 - Export OpenTelemetry through an OTLP collector and operate offline/online evaluations plus a CI
@@ -374,9 +377,14 @@ traffic should feed privacy-safe online aggregates and sampled, access-controlle
 
 ## Known limitations
 
-- The current web search adapter is intentionally a safe unavailable response; provider-specific
-  code is not bundled.
-- RAG generation is extractive and the offline corpus is deliberately small.
+- Live web search requires Tavily credentials and external connectivity. Without them, or when the
+  provider fails, the agent returns an explicit unavailable response instead of guessing.
+- RAG uses a small, committed JSON corpus and an in-memory lexical TF-IDF index. It does not yet
+  provide semantic embeddings, incremental refresh, deduplication, or freshness guarantees.
+- OpenAI generation is optional and runs only after successful local retrieval. The default and
+  provider-failure behavior remains a deterministic extractive answer.
+- The ingestion allowlist and HTML selectors are maintained manually, so upstream page redesigns
+  can require a corpus refresh or parser adjustment.
 - Fake records use fixed dates for reproducible challenge scenarios.
 - Request `user_id` validation is syntactic only; production requires authenticated ownership.
 - No state-changing support action is exposed.
