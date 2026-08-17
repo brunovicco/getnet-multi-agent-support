@@ -1,0 +1,1 @@
+"""Local Getnet retrieval adapters."""
