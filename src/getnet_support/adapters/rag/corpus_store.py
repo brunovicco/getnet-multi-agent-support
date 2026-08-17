@@ -14,7 +14,13 @@ def save_corpus(path: Path, chunks: tuple[KnowledgeChunk, ...]) -> None:
     """Write a portable JSON corpus artifact using only public chunk metadata."""
     path.parent.mkdir(parents=True, exist_ok=True)
     serialized = [
-        {"text": chunk.text, "source": chunk.source, "title": chunk.title} for chunk in chunks
+        {
+            "text": chunk.text,
+            "source": chunk.source,
+            "title": chunk.title,
+            "curated": chunk.curated,
+        }
+        for chunk in chunks
     ]
     path.write_text(json.dumps(serialized, ensure_ascii=False, indent=2), encoding="utf-8")
 
@@ -44,7 +50,17 @@ def load_corpus(path: Path) -> tuple[KnowledgeChunk, ...]:
             or not title.strip()
         ):
             raise CorpusFormatError(f"corpus item {index} has invalid text, source, or title")
-        chunks.append(KnowledgeChunk(text=text.strip(), source=source.strip(), title=title.strip()))
+        curated = item.get("curated", False)
+        if not isinstance(curated, bool):
+            raise CorpusFormatError(f"corpus item {index} has an invalid curated flag")
+        chunks.append(
+            KnowledgeChunk(
+                text=text.strip(),
+                source=source.strip(),
+                title=title.strip(),
+                curated=curated,
+            )
+        )
     return tuple(chunks)
 
 

@@ -7,10 +7,19 @@ from getnet_support.domain.models import (
     CustomerProfile,
     RetrievalResult,
     RetrievedChunk,
+    RouteDecision,
     TerminalStatus,
     Transaction,
     WebSearchResult,
 )
+
+
+class IntentClassifierPort(Protocol):
+    """Classify a message into a routing decision using a model provider."""
+
+    async def classify(self, message: str) -> RouteDecision | None:
+        """Return a decision, or ``None`` so the caller keeps its deterministic rules."""
+        ...
 
 
 class GetnetKnowledgePort(Protocol):

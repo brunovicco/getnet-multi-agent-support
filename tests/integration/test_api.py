@@ -42,6 +42,7 @@ def test_health_reports_local_capabilities() -> None:
         "rag": "ready",
         "web_search": "unavailable",
         "answer_generation": "extractive",
+        "router": "rules",
     }
 
 
@@ -57,6 +58,19 @@ def test_health_reports_configured_optional_providers_without_calling_them() -> 
 
     assert response.json()["web_search"] == "configured"
     assert response.json()["answer_generation"] == "openai"
+    assert response.json()["router"] == "rules"
+
+
+def test_health_reports_the_opt_in_llm_router() -> None:
+    settings = Settings(
+        llm_provider="openai",
+        llm_api_key="test-llm-key",
+        llm_router_enabled=True,
+    )
+    with TestClient(create_app(settings)) as client:
+        response = client.get("/health")
+
+    assert response.json()["router"] == "openai+rules"
 
 
 def test_chat_loads_the_configured_local_corpus(tmp_path: Path) -> None:
@@ -121,7 +135,8 @@ def test_chat_routes_general_information_to_web_search() -> None:
     assert response.status_code == 200
     assert body["agent"] == "knowledge"
     assert body["route"] == "web_search"
-    assert "requires a configured provider" in body["answer"]
+    assert "not available" in body["answer"]
+    assert "WEB_SEARCH_API_KEY" not in body["answer"]
 
 
 def test_chat_validates_empty_message() -> None:

@@ -12,6 +12,11 @@ invented current or customer-specific data when an integration is unavailable.
 The project was generated from the `service` profile of the Codex Python Engineering Harness for
 Python 3.13, with governance profiles and regulatory overlays disabled.
 
+It was built spec-first. The specification, design, decision record, and task breakdown are in
+[`specs/001-multi-agent-support/`](specs/001-multi-agent-support/); requirement identifiers
+(`REQ-*`) are traceable from the spec through the design to the tests that verify them. See
+[`specs/README.md`](specs/README.md) for the loop.
+
 ## Architecture
 
 For this challenge, orchestration is intentionally explicit instead of relying on a workflow
@@ -126,8 +131,19 @@ uv run python -m getnet_support.adapters.rag.ingest \
 ```
 
 The command requires at least one successful official-page fetch, combines those bounded chunks
-with a small reviewed seed set for deterministic challenge coverage, and writes a portable JSON
-artifact. At startup, `GETNET_CORPUS_PATH` is loaded, validated, and passed to the TF-IDF retriever.
+with a small reviewed seed set for deterministic challenge coverage, cleans the result, and writes
+a portable JSON artifact.
+
+**Corpus hygiene.** Marketing sites repeat navigation, contact, and footer blocks on every page;
+indexed verbatim they dominate a small lexical index and become the top match for unrelated
+questions. `adapters/rag/cleaning.py` removes them structurally rather than with a blocklist, so
+the filters survive a site redesign: text appearing on two or more canonical URLs is site chrome,
+chunks containing a support phone number are contact chrome, and chunks below a distinct-word floor
+carry no answer. On the committed artifact this removed 19 of 41 chunks.
+
+Reviewed seeds are stored in Portuguese and English, citing the same official page. A lexical index
+does not bridge languages, so without a Portuguese chunk a Portuguese product question would
+silently escalate. At startup, `GETNET_CORPUS_PATH` is loaded, validated, and passed to the TF-IDF retriever.
 If the artifact is missing or malformed, the reviewed seed set is the explicit network-silent
 fallback. Its citations point to the exact official product pages from which the statements were
 derived. `GetnetKnowledgePort` remains the migration seam for embeddings and a managed vector
@@ -265,8 +281,12 @@ uv run ruff check .
 uv run ruff format --check .
 uv run mypy src tests
 uv run pytest
+uv run python scripts/run_router_eval.py
 uv run python scripts/quality_gate.py
 ```
+
+The full strategy, including how the orchestration is covered end to end, is in
+[`docs/TESTING.md`](docs/TESTING.md).
 
 Tests cover routing, accent normalization, Getnet versus general web knowledge, local retrieval,
 corpus validation, Tavily and OpenAI HTTP contracts, provider failure fallbacks, customer lookup,

@@ -5,6 +5,7 @@ import re
 import unicodedata
 from collections import Counter
 
+from getnet_support.application.text import distinctive_terms
 from getnet_support.domain.models import KnowledgeChunk, RetrievalResult, RetrievedChunk
 
 
@@ -32,17 +33,45 @@ class LocalTfidfRetriever:
             token: math.log((1 + total_documents) / (1 + frequency)) + 1
             for token, frequency in document_frequency.items()
         }
+        self._maximum_idf = max(self._idf.values(), default=1.0)
         self._vectors = tuple(self._vectorize_counts(counts) for counts in token_counts)
 
     async def search(self, query: str, *, top_k: int = 3) -> RetrievalResult:
         """Return the highest-scoring chunks using local deterministic math."""
-        query_vector = self._vectorize_counts(Counter(tokenize(query)))
+        query_tokens = tokenize(query)
+        query_vector = self._vectorize_counts(Counter(query_tokens))
+        terms = distinctive_terms(query_tokens)
         scored = (
-            RetrievedChunk(chunk=chunk, score=self._cosine(query_vector, vector))
+            RetrievedChunk(
+                chunk=chunk,
+                score=self._cosine(query_vector, vector),
+                coverage=self._coverage(terms, chunk),
+            )
             for chunk, vector in zip(self._chunks, self._vectors, strict=True)
         )
         ranked = sorted(scored, key=lambda match: match.score, reverse=True)
         return RetrievalResult(matches=tuple(ranked[: max(0, top_k)]))
+
+    def _coverage(self, terms: frozenset[str], chunk: KnowledgeChunk) -> float:
+        """Return the share of the question's inverse-document-frequency mass present in a chunk.
+
+        Weighting by IDF is what separates "mentions the same common words" from "is about the
+        same thing": an unrelated product page can share "maquininha", but only the right page
+        shares "crediario".
+        """
+        if not terms:
+            return 1.0
+        chunk_tokens = set(tokenize(chunk.text))
+        total = sum(self._term_weight(term) for term in terms)
+        if total <= 0:
+            return 0.0
+        covered = sum(self._term_weight(term) for term in terms if term in chunk_tokens)
+        return covered / total
+
+    def _term_weight(self, term: str) -> float:
+        # A query term absent from the vocabulary cannot be covered by any chunk, and is weighted
+        # as maximally rare so an unanswerable question is not silently treated as covered.
+        return self._idf.get(term, self._maximum_idf)
 
     def _vectorize_counts(self, counts: Counter[str]) -> dict[str, float]:
         total = sum(counts.values())

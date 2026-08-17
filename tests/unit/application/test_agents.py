@@ -85,7 +85,9 @@ async def test_knowledge_agent_degrades_without_web_provider() -> None:
 
     assert result.route is RouteName.WEB_SEARCH
     assert result.sources == ()
-    assert "requires a configured" in result.answer
+    # The merchant sees a plain unavailable notice, never provider configuration details.
+    assert "not available" in result.answer
+    assert "WEB_SEARCH_API_KEY" not in result.answer
 
 
 @pytest.mark.asyncio

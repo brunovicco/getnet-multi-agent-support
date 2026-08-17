@@ -75,6 +75,9 @@ def configured_checks(root: Path) -> list[Check]:
     ]
     checks.append(Check("typing", ("mypy", *type_roots) if type_roots else ()))
     checks.append(Check("tests", ("pytest",) if test_roots else ()))
+    # Routing accuracy is a product property, so it is gated like typing and tests rather
+    # than checked by hand when someone remembers.
+    checks.append(Check("routing-eval", (sys.executable, "scripts/run_router_eval.py")))
     checks.append(
         Check(
             "security",
