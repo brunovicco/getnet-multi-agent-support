@@ -3,8 +3,7 @@
 Call :func:`configure_logging` once, at process startup, before any other code
 emits a log line. Renders JSON to stdout by default; set ``LOG_FORMAT=console``
 for a human-readable renderer during local development. Never log secrets,
-personal data, prompts, or model responses - see
-the security and observability contract in ``AGENTS.md``.
+personal data, prompts, or model responses; see the README security and observability sections.
 """
 
 import logging

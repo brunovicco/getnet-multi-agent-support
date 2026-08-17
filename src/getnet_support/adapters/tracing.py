@@ -1,7 +1,7 @@
 """Optional, failure-isolated Langfuse tracing for LLM calls.
 
 Tracing is disabled without credentials. Content capture also requires the explicit opt-in
-documented in ``docs/LLM_OBSERVABILITY.md``; otherwise only allowlisted metadata is sent.
+described in the README observability section; otherwise only allowlisted metadata is sent.
 """
 
 import os

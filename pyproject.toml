@@ -15,7 +15,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# Opt-in LLM tracing; see docs/LLM_OBSERVABILITY.md. Install with `uv sync --extra tracing`.
+# Opt-in LLM tracing; see the README observability section.
 tracing = [
     "langfuse>=3.0",
 ]
