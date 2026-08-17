@@ -1,6 +1,14 @@
 """Customer-specific support agent backed exclusively by typed tools."""
 
-from getnet_support.application.agents.router import normalize_text
+from getnet_support.application.agents.router import (
+    DEVICE_TERMS,
+    FAULT_TERMS,
+    MONEY_TERMS,
+    SETTLEMENT_PHRASES,
+    phrase_matches,
+    tokenize_message,
+)
+from getnet_support.application.language import detect_language, translate
 from getnet_support.application.ports import (
     CustomerProfileToolPort,
     RecentTransactionsToolPort,
@@ -8,27 +16,8 @@ from getnet_support.application.ports import (
 )
 from getnet_support.domain.models import AgentName, AgentResult, RouteName
 
-TERMINAL_SIGNALS = (
-    "machine",
-    "terminal",
-    "maquininha",
-    "connect",
-    "internet",
-    "decline",
-    "declined",
-    "negada",
-)
-TRANSACTION_SIGNALS = (
-    "sale",
-    "sales",
-    "transaction",
-    "deposit",
-    "settlement",
-    "venda",
-    "vendas",
-    "recebimento",
-    "deposito",
-)
+TERMINAL_SIGNALS = (*DEVICE_TERMS, *FAULT_TERMS, "connect", "internet", "wifi", "wi fi", "chip")
+TRANSACTION_SIGNALS = (*MONEY_TERMS, *SETTLEMENT_PHRASES)
 
 
 class CustomerSupportAgent:
@@ -47,20 +36,21 @@ class CustomerSupportAgent:
 
     async def handle(self, message: str, user_id: str) -> AgentResult:
         """Select only necessary tools and compose an evidence-based support answer."""
+        tokens = tokenize_message(message)
+        language = detect_language(message, tokens)
         profile = await self._customer_profiles.get_customer_profile(user_id)
         if profile is None:
             return AgentResult(
-                answer="No customer was found for this user identifier. Human support is required.",
+                answer=translate("support_unknown_customer", language),
                 agent=AgentName.ESCALATION,
                 route=RouteName.HUMAN_HANDOFF,
                 handoff_required=True,
                 tool_calls=1,
             )
 
-        normalized = normalize_text(message)
-        needs_terminal = self._contains_signal(normalized, TERMINAL_SIGNALS)
-        needs_transactions = self._contains_signal(normalized, TRANSACTION_SIGNALS)
-        answer_parts = [f"Customer profile status: {profile.status}."]
+        needs_terminal = _contains_signal(tokens, TERMINAL_SIGNALS)
+        needs_transactions = _contains_signal(tokens, TRANSACTION_SIGNALS)
+        answer_parts = [translate("support_profile_status", language, status=profile.status)]
         tool_calls = 1
 
         if needs_transactions:
@@ -68,37 +58,45 @@ class CustomerSupportAgent:
             tool_calls += 1
             if transactions:
                 latest = transactions[0]
-                settlement = latest.settlement_status.replace("_", " ")
                 answer_parts.append(
-                    f"The most recent sale is {latest.status} and its settlement is {settlement}."
+                    translate(
+                        "support_latest_sale",
+                        language,
+                        status=latest.status,
+                        settlement=latest.settlement_status.replace("_", " "),
+                    )
                 )
                 if latest.expected_settlement_at is not None:
-                    settlement_date = latest.expected_settlement_at.date().isoformat()
-                    answer_parts.append(f"Expected settlement date: {settlement_date}.")
+                    answer_parts.append(
+                        translate(
+                            "support_settlement_date",
+                            language,
+                            date=latest.expected_settlement_at.date().isoformat(),
+                        )
+                    )
             else:
-                answer_parts.append("No recent transactions were returned by the customer tool.")
+                answer_parts.append(translate("support_no_transactions", language))
 
         if needs_terminal:
             terminal = await self._terminal_status.get_terminal_status(user_id)
             tool_calls += 1
             if terminal is None:
-                answer_parts.append("No terminal is assigned to this customer.")
+                answer_parts.append(translate("support_no_terminal", language))
             else:
                 answer_parts.append(
-                    f"Terminal {terminal.terminal_id} connectivity is {terminal.connectivity}; "
-                    f"diagnostic: {terminal.diagnostic}."
+                    translate(
+                        "support_terminal_status",
+                        language,
+                        terminal=terminal.terminal_id,
+                        connectivity=terminal.connectivity,
+                        diagnostic=terminal.diagnostic,
+                    )
                 )
                 if terminal.connectivity == "disconnected":
-                    answer_parts.append(
-                        "Check Wi-Fi or mobile signal, restart the terminal, and contact human "
-                        "support if it remains offline."
-                    )
+                    answer_parts.append(translate("support_terminal_offline_guidance", language))
 
         if not needs_terminal and not needs_transactions:
-            answer_parts.append(
-                "The support tools do not expose the operation requested; "
-                "human support is recommended."
-            )
+            answer_parts.append(translate("support_out_of_scope", language))
 
         return AgentResult(
             answer=" ".join(answer_parts),
@@ -107,7 +105,6 @@ class CustomerSupportAgent:
             tool_calls=tool_calls,
         )
 
-    @staticmethod
-    def _contains_signal(normalized: str, signals: tuple[str, ...]) -> bool:
-        padded = f" {normalized} "
-        return any(f" {normalize_text(signal)} " in padded for signal in signals)
+
+def _contains_signal(tokens: tuple[str, ...], signals: tuple[str, ...]) -> bool:
+    return any(phrase_matches(tokens, signal) for signal in signals)

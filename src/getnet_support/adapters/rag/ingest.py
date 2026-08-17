@@ -6,6 +6,7 @@ from pathlib import Path
 import httpx
 from bs4 import BeautifulSoup
 
+from getnet_support.adapters.rag.cleaning import clean_corpus
 from getnet_support.adapters.rag.corpus import DEFAULT_GETNET_CORPUS
 from getnet_support.adapters.rag.corpus_store import save_corpus
 from getnet_support.domain.models import KnowledgeChunk
@@ -55,7 +56,9 @@ class GetnetHttpIngestor:
     def parse_html(self, html: str, *, source: str) -> tuple[KnowledgeChunk, ...]:
         """Convert one HTML document into bounded, paragraph-aware chunks."""
         soup = BeautifulSoup(html, "html.parser")
-        for element in soup(["script", "style", "noscript", "svg"]):
+        for element in soup(
+            ["script", "style", "noscript", "svg", "nav", "header", "footer", "aside", "form"]
+        ):
             element.decompose()
         title = soup.title.get_text(" ", strip=True) if soup.title else source
         content = soup.find("main") or soup.body or soup
@@ -106,8 +109,9 @@ async def _run(output: Path, urls: tuple[str, ...]) -> None:
     if not ingested_chunks:
         raise RuntimeError("ingestion produced no chunks")
     # Reviewed seeds keep the challenge scenarios deterministic while the fetched chunks extend
-    # coverage with the latest content from the selected official pages.
-    save_corpus(output, (*DEFAULT_GETNET_CORPUS, *ingested_chunks))
+    # coverage with the latest content from the selected official pages. Cleaning runs last so
+    # cross-page navigation and contact blocks never reach the index.
+    save_corpus(output, clean_corpus((*DEFAULT_GETNET_CORPUS, *ingested_chunks)))
 
 
 def main() -> None:

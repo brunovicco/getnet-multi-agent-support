@@ -79,3 +79,46 @@ async def test_orchestration_paths(message: str, agent: AgentName, route: RouteN
     assert isinstance(reference, str)
     assert reference.startswith("usr_")
     assert all("cliente1988" not in str(fields) for fields in event_fields)
+
+
+@pytest.mark.asyncio
+async def test_incident_with_a_product_topic_runs_an_agent_sequence() -> None:
+    """REQ-R6: both agents contribute and the route is observable as a sequence."""
+    events = RecordingEvents()
+
+    result = await build_orchestrator(events).chat(
+        message="Minha maquininha não conecta e como funciona a antecipação?",
+        user_id="cliente1988",
+    )
+
+    assert result.route is RouteName.AGENT_SEQUENCE
+    assert "GET-12345" in result.answer
+    assert "antecipa" in result.answer.lower()
+    router_event = next(fields for event, fields in events.events if event == "router_decision")
+    assert router_event["secondary_agent"] is not None
+
+
+@pytest.mark.asyncio
+async def test_escalation_carries_a_handoff_reference_in_the_user_language() -> None:
+    """REQ-E1, REQ-L1: the handoff is correlatable and written in Portuguese."""
+    result = await build_orchestrator(RecordingEvents()).chat(
+        message="Quero transferir dinheiro da minha conta",
+        user_id="cliente1988",
+    )
+
+    assert result.handoff_required is True
+    assert result.route is RouteName.HUMAN_HANDOFF
+    assert "HO-" in result.answer
+    assert "especialista humano" in result.answer
+
+
+@pytest.mark.asyncio
+async def test_unknown_customer_is_handed_off_without_disclosure() -> None:
+    """REQ-S3: an unknown identifier reveals nothing about any customer."""
+    result = await build_orchestrator(RecordingEvents()).chat(
+        message="minha maquininha não conecta",
+        user_id="desconhecido999",
+    )
+
+    assert result.handoff_required is True
+    assert "GET-12345" not in result.answer

@@ -34,3 +34,6 @@ jobs:
 
       - name: Project quality gate
         run: uv run python scripts/quality_gate.py
+
+      - name: Offline routing evaluation
+        run: uv run python scripts/run_router_eval.py

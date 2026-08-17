@@ -44,7 +44,7 @@ class ChatResponse(BaseModel):
 
     answer: str
     agent: Literal["knowledge", "support", "escalation"]
-    route: Literal["getnet_rag", "web_search", "customer_tools", "human_handoff"]
+    route: Literal["getnet_rag", "web_search", "customer_tools", "human_handoff", "agent_sequence"]
     sources: list[SourceResponse]
     trace_id: str
     confidence: float
@@ -72,3 +72,4 @@ class HealthResponse(BaseModel):
     rag: Literal["ready"] = "ready"
     web_search: Literal["configured", "unavailable"]
     answer_generation: Literal["openai", "extractive"]
+    router: Literal["rules", "openai+rules"] = "rules"

@@ -9,7 +9,7 @@ from getnet_support.application.agents.escalation import EscalationAgent
 from getnet_support.application.agents.knowledge import KnowledgeAgent
 from getnet_support.application.agents.router import RouterAgent
 from getnet_support.application.ports import EventSink
-from getnet_support.domain.models import AgentName, ChatResult
+from getnet_support.domain.models import AgentName, AgentResult, ChatResult, RouteName
 
 ROUTING_CONFIDENCE_THRESHOLD = 0.60
 _USER_REFERENCE_NAMESPACE = "getnet-multi-agent-support"
@@ -41,30 +41,42 @@ class SupportOrchestrator:
         self._events = events
 
     async def chat(self, *, message: str, user_id: str, trace_id: str | None = None) -> ChatResult:
-        """Route and execute a message through exactly one specialized agent."""
+        """Route a message to one specialized agent, or to a short agent sequence."""
         request_trace_id = trace_id or uuid4().hex
         user_reference_hash = pseudonymize_user_id(user_id)
         started = perf_counter()
-        decision = self._router.route(message)
+        decision = await self._router.route(message)
         self._events.emit(
             "router_decision",
             {
                 "trace_id": request_trace_id,
                 "user_reference_hash": user_reference_hash,
                 "selected_agent": decision.agent.value,
+                "secondary_agent": (
+                    decision.secondary_agent.value if decision.secondary_agent else None
+                ),
                 "confidence": decision.confidence,
+                "guardrail": decision.guardrail,
                 "reason": decision.reason,
             },
         )
 
         if decision.confidence < ROUTING_CONFIDENCE_THRESHOLD:
-            result = self._escalation.handle(reason="Router confidence below threshold.")
-        elif decision.agent is AgentName.KNOWLEDGE:
-            result = await self._knowledge.handle(message)
-        elif decision.agent is AgentName.SUPPORT:
-            result = await self._support.handle(message, user_id)
+            result = self._escalation.handle(
+                reason="Router confidence below threshold.",
+                message=message,
+            )
+        elif decision.agent is AgentName.ESCALATION:
+            result = self._escalation.handle(reason=decision.reason, message=message)
         else:
-            result = self._escalation.handle(reason=decision.reason)
+            result = await self._run_agent(decision.agent, message=message, user_id=user_id)
+            if decision.secondary_agent is not None:
+                secondary = await self._run_agent(
+                    decision.secondary_agent,
+                    message=message,
+                    user_id=user_id,
+                )
+                result = _merge_sequence(result, secondary)
 
         latency_ms = round((perf_counter() - started) * 1000, 2)
         self._events.emit(
@@ -89,3 +101,50 @@ class SupportOrchestrator:
             confidence=decision.confidence,
             handoff_required=result.handoff_required,
         )
+
+    async def _run_agent(self, agent: AgentName, *, message: str, user_id: str) -> AgentResult:
+        if agent is AgentName.KNOWLEDGE:
+            return await self._knowledge.handle(message)
+        if agent is AgentName.SUPPORT:
+            return await self._support.handle(message, user_id)
+        return self._escalation.handle(reason="Unsupported agent selection.", message=message)
+
+
+def _merge_sequence(primary: AgentResult, secondary: AgentResult) -> AgentResult:
+    """Combine two agent results into one observable sequence outcome.
+
+    The primary agent keeps ownership of the answer; the secondary agent only appends context.
+    A handoff raised by either agent is preserved so a sequence can never hide an escalation.
+    """
+    if primary.handoff_required and secondary.handoff_required:
+        return primary
+    if primary.handoff_required:
+        return AgentResult(
+            answer=secondary.answer,
+            agent=secondary.agent,
+            route=RouteName.AGENT_SEQUENCE,
+            sources=secondary.sources,
+            handoff_required=secondary.handoff_required,
+            tool_calls=primary.tool_calls + secondary.tool_calls,
+            retrieval_result_count=(
+                primary.retrieval_result_count + secondary.retrieval_result_count
+            ),
+        )
+    if secondary.handoff_required:
+        return AgentResult(
+            answer=primary.answer,
+            agent=primary.agent,
+            route=RouteName.AGENT_SEQUENCE,
+            sources=primary.sources,
+            tool_calls=primary.tool_calls + secondary.tool_calls,
+            retrieval_result_count=primary.retrieval_result_count,
+        )
+    return AgentResult(
+        answer=f"{primary.answer} {secondary.answer}".strip(),
+        agent=primary.agent,
+        route=RouteName.AGENT_SEQUENCE,
+        sources=(*primary.sources, *secondary.sources),
+        handoff_required=False,
+        tool_calls=primary.tool_calls + secondary.tool_calls,
+        retrieval_result_count=primary.retrieval_result_count + secondary.retrieval_result_count,
+    )

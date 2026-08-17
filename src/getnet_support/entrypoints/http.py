@@ -11,6 +11,7 @@ from getnet_support.adapters.rag.corpus import DEFAULT_GETNET_CORPUS
 from getnet_support.adapters.rag.corpus_store import load_corpus_or_fallback
 from getnet_support.adapters.rag.retriever import LocalTfidfRetriever
 from getnet_support.adapters.repositories.fake_customer_repository import FakeCustomerRepository
+from getnet_support.adapters.routing.openai_intent_classifier import OpenAIIntentClassifier
 from getnet_support.adapters.settings import Settings
 from getnet_support.adapters.tools.customer import CustomerProfileTool
 from getnet_support.adapters.tools.terminal import TerminalStatusTool
@@ -58,13 +59,25 @@ def build_orchestrator(settings: Settings) -> SupportOrchestrator:
         ),
         answer_generator,
     )
+    intent_classifier = (
+        OpenAIIntentClassifier(
+            api_key=settings.llm_api_key,
+            model=settings.llm_model,
+            base_url=settings.llm_base_url,
+            timeout_seconds=settings.llm_router_timeout_seconds,
+        )
+        if settings.llm_router_enabled
+        and settings.llm_provider.casefold() == "openai"
+        and settings.llm_api_key
+        else None
+    )
     support = CustomerSupportAgent(
         CustomerProfileTool(repository),
         RecentTransactionsTool(repository),
         TerminalStatusTool(repository),
     )
     return SupportOrchestrator(
-        router=RouterAgent(),
+        router=RouterAgent(classifier=intent_classifier),
         knowledge=knowledge,
         support=support,
         escalation=EscalationAgent(),
@@ -113,6 +126,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 if resolved_settings.llm_provider.casefold() == "openai"
                 and resolved_settings.llm_api_key
                 else "extractive"
+            ),
+            router=(
+                "openai+rules"
+                if resolved_settings.llm_router_enabled
+                and resolved_settings.llm_provider.casefold() == "openai"
+                and resolved_settings.llm_api_key
+                else "rules"
             ),
         )
 

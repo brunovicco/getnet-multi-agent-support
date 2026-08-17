@@ -2,206 +2,133 @@
   {
     "text": "Get Clássica provides printed and digital receipts, a touchscreen, Pix, QR Code, contactless and chip payments, Wi-Fi and 3G. Get Smart has those payment features and additionally provides access to business-management applications.",
     "source": "https://site.getnet.com.br/produtos-fisicos/",
-    "title": "Getnet physical products"
+    "title": "Getnet physical products",
+    "curated": true
   },
   {
     "text": "Payment Link lets a merchant create an online checkout link for credit, debit and Pix. The link can be shared through WhatsApp, social networks, email or other remote channels, so a physical card machine or website is not required for the sale.",
     "source": "https://site.getnet.com.br/link-de-pagamento/",
-    "title": "Getnet Payment Link"
+    "title": "Getnet Payment Link",
+    "curated": true
   },
   {
     "text": "Getnet customers can contract Pix regardless of which bank is linked to receive sales. Pix sales can be tracked in the Getnet Brasil app, Portal Minha Conta and the POS sales report. A receiving account still has to be linked during activation.",
     "source": "https://site.getnet.com.br/pix/",
-    "title": "Pix with Getnet"
+    "title": "Pix with Getnet",
+    "curated": true
   },
   {
     "text": "Receivables advance gives a merchant access before the original settlement date to money from completed credit sales, subject to a fee. Getnet says eligible credit sales can be advanced through the Getnet Brasil app; rates and cash-flow impact should be evaluated before confirming.",
     "source": "https://site.getnet.com.br/quando-vale-a-pena-antecipar-as-suas-vendas-no-cartao/",
-    "title": "Getnet receivables advance"
+    "title": "Getnet receivables advance",
+    "curated": true
   },
   {
     "text": "The Crediário Getnet manual states that installments vary by financial institution: up to 24 installments generally and up to 48 with Santander, subject to change and the issuing institution's conditions.",
     "source": "https://site.getnet.com.br/wp-content/uploads/2024/09/Folder_Credirio.pdf",
-    "title": "Crediário Getnet manual"
+    "title": "Crediário Getnet manual",
+    "curated": true
+  },
+  {
+    "text": "A Get Clássica oferece comprovante impresso e digital, tela sensível ao toque, Pix, QR Code, pagamento por aproximação e por chip, Wi-Fi e 3G. A Get Smart tem os mesmos recursos de pagamento e ainda dá acesso a aplicativos de gestão do negócio.",
+    "source": "https://site.getnet.com.br/produtos-fisicos/",
+    "title": "Maquininhas Getnet",
+    "curated": true
+  },
+  {
+    "text": "O Link de Pagamento permite ao lojista criar um link de checkout online para crédito, débito e Pix. O link pode ser compartilhado por WhatsApp, redes sociais, e-mail ou outros canais remotos, então não é necessário ter maquininha física nem site para concluir a venda.",
+    "source": "https://site.getnet.com.br/link-de-pagamento/",
+    "title": "Link de Pagamento Getnet",
+    "curated": true
+  },
+  {
+    "text": "O cliente Getnet pode contratar o Pix independentemente de qual banco esteja ligado ao recebimento das vendas. As vendas por Pix podem ser acompanhadas no app Getnet Brasil, no Portal Minha Conta e no relatório de vendas da maquininha. Uma conta de recebimento ainda precisa ser vinculada na ativação.",
+    "source": "https://site.getnet.com.br/pix/",
+    "title": "Pix na Getnet",
+    "curated": true
+  },
+  {
+    "text": "A antecipação de recebíveis dá ao lojista acesso, antes da data original de liquidação, ao dinheiro de vendas no crédito já concluídas, mediante uma taxa. Segundo a Getnet, as vendas no crédito elegíveis podem ser antecipadas pelo app Getnet Brasil; taxas e impacto no fluxo de caixa devem ser avaliados antes de confirmar.",
+    "source": "https://site.getnet.com.br/quando-vale-a-pena-antecipar-as-suas-vendas-no-cartao/",
+    "title": "Antecipação de recebíveis Getnet",
+    "curated": true
+  },
+  {
+    "text": "O manual do Crediário Getnet informa que a quantidade de parcelas varia conforme a instituição financeira: em geral até 24 parcelas e até 48 parcelas com o Santander, sujeito a alteração e às condições da instituição emissora.",
+    "source": "https://site.getnet.com.br/wp-content/uploads/2024/09/Folder_Credirio.pdf",
+    "title": "Manual do Crediário Getnet",
+    "curated": true
   },
   {
     "text": "Getnet The Leading AI Payments Company in Latin America and Iberia Transforming the future of payments We help businesses grow through innovative, frictionless and secure technology that enables a fully connected, smart and robust payment platform. All your payments, data, and finance connected Omnichannel experience across channels, markets and devices Seamless integration with your existing ecosystem All your payments, data, and finance connected BUILT FOR EVERY BUSINESS The perfect payment fit for you We provide scalable solutions, tailored to local needs for any size and industry. International companies Entrepreneurs SMEs Built for tailored-made solutions Be limitless . Get everything your business needs. Accept all payment methods, whether in store, online or on the go. Connect your physical and digital worlds with seamless omnichannel solutions. Expand your reach with borderless",
     "source": "https://www.getnet.net/en/",
-    "title": "Getnet - Home"
+    "title": "Getnet - Home",
+    "curated": false
   },
   {
     "text": "payments, everywhere. Make smarter decisions using data-driven insights to grow safely. Access financial solutions designed for flexibility and growth. Unlock value-added services to enhance customer experience and performance. Built to work together Connecting technology , partners and markets to transform business performance Accelerate your growth Expand your possibilities Unlock new revenue Start succeeding today Global scale, local expertise With presence in Brazil, Mexico, Chile, Argentina, Uruguay, Colombia, Spain, and Portugal. Looking up for our top stories ? Getnet launches Getnet Engage to help merchants build customer loyalty through payments Getnet develops infrastructure that enables businesses to accept AI agent-initiated payments Getnet launches Get Code, a global developer community to foster innovation and collaboration Getnet transforms Grupo Pascual’s delivery mobiles",
     "source": "https://www.getnet.net/en/",
-    "title": "Getnet - Home"
+    "title": "Getnet - Home",
+    "curated": false
   },
   {
     "text": "into full POS terminals Uruguay joins Getnet’s regional omnichannel payment network Soft Restaurant and Getnet partnered to transform Latin America’s dining experience Getnet and Koin unite to strengthen fraud prevention in Latin America Meliá Hotels International and Getnet are pioneers in payment security in Latin America, offering P2PE solutions. Getnet to appoint Juan Franco as new global CEO Getnet launches Getnet SEP, a regionar e-commerce API for Latin America Getnet drives the innovation of public transport in Mexico City Let’s shape your growth together",
     "source": "https://www.getnet.net/en/",
-    "title": "Getnet - Home"
-  },
-  {
-    "text": "Getnet The Leading AI Payments Company in Latin America and Iberia Transforming the future of payments We help businesses grow through innovative, frictionless and secure technology that enables a fully connected, smart and robust payment platform. All your payments, data, and finance connected Omnichannel experience across channels, markets and devices Seamless integration with your existing ecosystem All your payments, data, and finance connected BUILT FOR EVERY BUSINESS The perfect payment fit for you We provide scalable solutions, tailored to local needs for any size and industry. International companies Entrepreneurs SMEs Built for tailored-made solutions Be limitless . Get everything your business needs. Accept all payment methods, whether in store, online or on the go. Connect your physical and digital worlds with seamless omnichannel solutions. Expand your reach with borderless",
-    "source": "https://www.getnet.net/en",
-    "title": "Getnet - Home"
-  },
-  {
-    "text": "payments, everywhere. Make smarter decisions using data-driven insights to grow safely. Access financial solutions designed for flexibility and growth. Unlock value-added services to enhance customer experience and performance. Built to work together Connecting technology , partners and markets to transform business performance Accelerate your growth Expand your possibilities Unlock new revenue Start succeeding today Global scale, local expertise With presence in Brazil, Mexico, Chile, Argentina, Uruguay, Colombia, Spain, and Portugal. Looking up for our top stories ? Getnet launches Getnet Engage to help merchants build customer loyalty through payments Getnet develops infrastructure that enables businesses to accept AI agent-initiated payments Getnet launches Get Code, a global developer community to foster innovation and collaboration Getnet transforms Grupo Pascual’s delivery mobiles",
-    "source": "https://www.getnet.net/en",
-    "title": "Getnet - Home"
-  },
-  {
-    "text": "into full POS terminals Uruguay joins Getnet’s regional omnichannel payment network Soft Restaurant and Getnet partnered to transform Latin America’s dining experience Getnet and Koin unite to strengthen fraud prevention in Latin America Meliá Hotels International and Getnet are pioneers in payment security in Latin America, offering P2PE solutions. Getnet to appoint Juan Franco as new global CEO Getnet launches Getnet SEP, a regionar e-commerce API for Latin America Getnet drives the innovation of public transport in Mexico City Let’s shape your growth together",
-    "source": "https://www.getnet.net/en",
-    "title": "Getnet - Home"
-  },
-  {
-    "text": "Já sou cliente Get Atendimento - 06h00 às 22h00 Capitais e regiões metropolitanas 4002-4000 ou 4003-4000 Interior e Demais localidades 0800-648-8000 Fale no WhatsApp Fale conosco Central de ajuda Minha Conta BAIXAR APP GETNET BRASIL Capitais e regiões metropolitanas 4002-4000 ou 4003-4000 Interior e Demais localidades 0800-648-8000 Fale no WhatsApp Fale conosco Central de ajuda Minha Conta BAIXAR APP GETNET BRASIL Baixe o App Getnet Brasil Aponte a câmera do seu celular: Ou acesse pelas lojas: Pelo site, rápido e fácil Cadastro sem produto Você não precisa ter um de nossos produtos para se cadastrar. Sou Pessoa Jurídica As melhores ofertas para o seu CNPJ Sou Pessoa Física As melhores ofertas para o seu CPF Cadastro sem produto Você não precisa ter um de nossos produtos para se cadastrar. Sou Pessoa Jurídica As melhores ofertas para o seu CNPJ Sou Pessoa Física As melhores ofertas para o",
-    "source": "https://site.getnet.com.br/produtos-fisicos/",
-    "title": "Getnet | Getnet, uma empresa do grupo Santander"
-  },
-  {
-    "text": "seu CPF Atendimento Pelo WhatsApp Fale com um de nossos especialistas Pelo telefone Ligue 4002-4000 Pelo WhatsApp Fale com um de nossos especialistas Pelo telefone Ligue 4002-4000 Produtos Taxas especiais para PJ Você que vende R$5mil/mês ganhe taxas personalizadas e aluguel grátis. SIMULE SUAS TAXAS Para o seu negócio Maquininhas Comece a vender agora Gestão de Vendas Integre sua loja do pedido ao estoque Get Tap O seu celular vira uma maquininha Link de Pagamento Venda pelas redes sociais Checkout de Pagamentos Soluções completas para vendas online Get Conta Conta digital e cartão grátis Facilite a sua rotina Pix Receba suas vendas em segundos Empréstimo Faça o seu negócio decolar Crediário Parcelamento em até 48x Pagamentos recorrentes Venda com mensalidade Mundo Open Escolha como economizar Split Simplifique a divisão de vendas Conversor de moedas Receba do seu cliente em moeda",
-    "source": "https://site.getnet.com.br/produtos-fisicos/",
-    "title": "Getnet | Getnet, uma empresa do grupo Santander"
-  },
-  {
-    "text": "estrangeira Get Store Automatize o seu negócio Taxas especiais para PJ Você que vende R$5mil/mês ganhe taxas personalizadas e aluguel grátis. SIMULE SUAS TAXAS Para o seu negócio Maquininhas Comece a vender agora Gestão de Vendas Integre sua loja do pedido ao estoque Get Tap O seu celular vira uma maquininha Link de Pagamento Venda pelas redes sociais Checkout de Pagamentos Soluções completas para vendas online Get Conta Conta digital e cartão grátis Maquininhas Comece a vender agora Gestão de Vendas Integre sua loja do pedido ao estoque Get Tap O seu celular vira uma maquininha Link de Pagamento Venda pelas redes sociais Checkout de Pagamentos Soluções completas para vendas online Get Conta Conta digital e cartão grátis Facilite a sua rotina Pix Receba suas vendas em segundos Empréstimo Faça o seu negócio decolar Crediário Parcelamento em até 48x Pagamentos recorrentes Venda com",
-    "source": "https://site.getnet.com.br/produtos-fisicos/",
-    "title": "Getnet | Getnet, uma empresa do grupo Santander"
-  },
-  {
-    "text": "mensalidade Mundo Open Escolha como economizar Split Simplifique a divisão de vendas Conversor de moedas Receba do seu cliente em moeda estrangeira Get Store Automatize o seu negócio Pix Receba suas vendas em segundos Empréstimo Faça o seu negócio decolar Crediário Parcelamento em até 48x Pagamentos recorrentes Venda com mensalidade Mundo Open Escolha como economizar Split Simplifique a divisão de vendas Conversor de moedas Receba do seu cliente em moeda estrangeira Get Store Automatize o seu negócio Mais Soluções Hidden title Solução TEF Automação de ponta a ponta POS TEF Flexibilidade para vender Conciliador Gestão financeira inteligente Ofertas TEF Gestão financeira inteligente Hidden title Recarga de celular Mais comodidade para seu cliente Portal do cartão BNDES A vitrine virtual do seu negócio Hidden title Solução TEF Automação de ponta a ponta POS TEF Flexibilidade para vender",
-    "source": "https://site.getnet.com.br/produtos-fisicos/",
-    "title": "Getnet | Getnet, uma empresa do grupo Santander"
-  },
-  {
-    "text": "Conciliador Gestão financeira inteligente Ofertas TEF Gestão financeira inteligente Solução TEF Automação de ponta a ponta POS TEF Flexibilidade para vender Conciliador Gestão financeira inteligente Ofertas TEF Gestão financeira inteligente Hidden title Recarga de celular Mais comodidade para seu cliente Portal do cartão BNDES A vitrine virtual do seu negócio Recarga de celular Mais comodidade para seu cliente Portal do cartão BNDES A vitrine virtual do seu negócio Get Ajuda Saiba mais Hidden title Get Code Nossa História Parcerias Patrocínios Carreiras Imprensa Hidden title Get Code Nossa História Parcerias Patrocínios Carreiras Imprensa Get Code Nossa História Parcerias Patrocínios Carreiras Imprensa Blog Já sou cliente Get Atendimento - 06h00 às 22h00 Capitais e regiões metropolitanas 4002-4000 ou 4003-4000 Interior e Demais localidades 0800-648-8000 Fale no WhatsApp Fale conosco",
-    "source": "https://site.getnet.com.br/produtos-fisicos/",
-    "title": "Getnet | Getnet, uma empresa do grupo Santander"
-  },
-  {
-    "text": "Central de ajuda Minha Conta BAIXAR APP GETNET BRASIL Capitais e regiões metropolitanas 4002-4000 ou 4003-4000 Interior e Demais localidades 0800-648-8000 Fale no WhatsApp Fale conosco Central de ajuda Minha Conta BAIXAR APP GETNET BRASIL Baixe o App Getnet Brasil Aponte a câmera do seu celular: Ou acesse pelas lojas: Pelo site, rápido e fácil Cadastro sem produto Você não precisa ter um de nossos produtos para se cadastrar. Sou Pessoa Jurídica As melhores ofertas para o seu CNPJ Sou Pessoa Física As melhores ofertas para o seu CPF Cadastro sem produto Você não precisa ter um de nossos produtos para se cadastrar. Sou Pessoa Jurídica As melhores ofertas para o seu CNPJ Sou Pessoa Física As melhores ofertas para o seu CPF Atendimento Pelo WhatsApp Fale com um de nossos especialistas Pelo telefone Ligue 4002-4000 Pelo WhatsApp Fale com um de nossos especialistas Pelo telefone Ligue",
-    "source": "https://site.getnet.com.br/produtos-fisicos/",
-    "title": "Getnet | Getnet, uma empresa do grupo Santander"
-  },
-  {
-    "text": "4002-4000 A maquininha Getnet que impulsiona as vendas do seu negócio. Onde você recebe Get Conta com cartão grátis Quando recebe 2 dias úteis Vendendo você ganha máquina grátis Venda o quanto quiser de graça pelo celular Acima de R$ 20mil por mês | Get Clássica Acima de R$ 40mil por mês | Get Clássica ou Get Smart Acima de R$ 80mil por mês | Get Clássica ou Get Smart *As modalidades de Voucher (VA/VR), Crediário não compõem faturamento para isenção do aluguel Selecione para ver as taxas A partir de: Débito — Crédito 1x — Crédito 2x — Crédito 3x — Crédito 4x — Crédito 5x — Crédito 6x — Crédito 7x — Crédito 8x — Crédito 9x — Crédito 10x — Crédito 11x — Crédito 12x — Caso não atinja os faturamentos do quadro acima, segue o valor de utilização: Venda pelo celular R$ 0,00/mês Get Clássica R$ 79,90/mês Get Smart R$ 129,90/mês Quanto maior seu faturamento, menores suas taxas Comece a vender",
-    "source": "https://site.getnet.com.br/produtos-fisicos/",
-    "title": "Getnet | Getnet, uma empresa do grupo Santander"
+    "title": "Getnet - Home",
+    "curated": false
   },
   {
     "text": "ainda hoje! Peça sua maquininha com aluguel zero*, e venda sem complicação Frete grátis para todo o Brasil Comece a vender ainda hoje! Peça sua maquininha com aluguel zero*, e venda sem complicação Simule sua vendas e veja quanto você recebe Aceite pagamentos com Pix, QR Code, aproximação e mais de 80 bandeiras Escala Global conhecimento local Oferecemos soluções personalizadas e suporte para seu negócio # 1 Em transações na América Latina R$ 1,43tn volume total processado em 2025 10.5bn transações processadas em 2025 1.2 milhões clientes ativos 35 países cobertos por aquisição de licenças Aceite pagamentos com Pix, QR Code, aproximação e mais de 80 bandeiras Escala Global conhecimento local Oferecemos soluções personalizadas e suporte para seu negócio Dúvidas sobre as maquininhas? Adquira nossos produtos e impulsione suas vendas​​ Tenha suporte:",
     "source": "https://site.getnet.com.br/produtos-fisicos/",
-    "title": "Getnet | Getnet, uma empresa do grupo Santander"
-  },
-  {
-    "text": "Já sou cliente Get Atendimento - 06h00 às 22h00 Capitais e regiões metropolitanas 4002-4000 ou 4003-4000 Interior e Demais localidades 0800-648-8000 Fale no WhatsApp Fale conosco Central de ajuda Minha Conta BAIXAR APP GETNET BRASIL Capitais e regiões metropolitanas 4002-4000 ou 4003-4000 Interior e Demais localidades 0800-648-8000 Fale no WhatsApp Fale conosco Central de ajuda Minha Conta BAIXAR APP GETNET BRASIL Baixe o App Getnet Brasil Aponte a câmera do seu celular: Ou acesse pelas lojas: Pelo site, rápido e fácil Cadastro sem produto Você não precisa ter um de nossos produtos para se cadastrar. Sou Pessoa Jurídica As melhores ofertas para o seu CNPJ Sou Pessoa Física As melhores ofertas para o seu CPF Cadastro sem produto Você não precisa ter um de nossos produtos para se cadastrar. Sou Pessoa Jurídica As melhores ofertas para o seu CNPJ Sou Pessoa Física As melhores ofertas para o",
-    "source": "https://site.getnet.com.br/link-de-pagamento/",
-    "title": "Getnet | Link de Pagamento: venda mais online | Getnet"
-  },
-  {
-    "text": "seu CPF Atendimento Pelo WhatsApp Fale com um de nossos especialistas Pelo telefone Ligue 4002-4000 Pelo WhatsApp Fale com um de nossos especialistas Pelo telefone Ligue 4002-4000 Produtos Taxas especiais para PJ Você que vende R$5mil/mês ganhe taxas personalizadas e aluguel grátis. SIMULE SUAS TAXAS Para o seu negócio Maquininhas Comece a vender agora Gestão de Vendas Integre sua loja do pedido ao estoque Get Tap O seu celular vira uma maquininha Link de Pagamento Venda pelas redes sociais Checkout de Pagamentos Soluções completas para vendas online Get Conta Conta digital e cartão grátis Facilite a sua rotina Pix Receba suas vendas em segundos Empréstimo Faça o seu negócio decolar Crediário Parcelamento em até 48x Pagamentos recorrentes Venda com mensalidade Mundo Open Escolha como economizar Split Simplifique a divisão de vendas Conversor de moedas Receba do seu cliente em moeda",
-    "source": "https://site.getnet.com.br/link-de-pagamento/",
-    "title": "Getnet | Link de Pagamento: venda mais online | Getnet"
-  },
-  {
-    "text": "estrangeira Get Store Automatize o seu negócio Taxas especiais para PJ Você que vende R$5mil/mês ganhe taxas personalizadas e aluguel grátis. SIMULE SUAS TAXAS Para o seu negócio Maquininhas Comece a vender agora Gestão de Vendas Integre sua loja do pedido ao estoque Get Tap O seu celular vira uma maquininha Link de Pagamento Venda pelas redes sociais Checkout de Pagamentos Soluções completas para vendas online Get Conta Conta digital e cartão grátis Maquininhas Comece a vender agora Gestão de Vendas Integre sua loja do pedido ao estoque Get Tap O seu celular vira uma maquininha Link de Pagamento Venda pelas redes sociais Checkout de Pagamentos Soluções completas para vendas online Get Conta Conta digital e cartão grátis Facilite a sua rotina Pix Receba suas vendas em segundos Empréstimo Faça o seu negócio decolar Crediário Parcelamento em até 48x Pagamentos recorrentes Venda com",
-    "source": "https://site.getnet.com.br/link-de-pagamento/",
-    "title": "Getnet | Link de Pagamento: venda mais online | Getnet"
-  },
-  {
-    "text": "mensalidade Mundo Open Escolha como economizar Split Simplifique a divisão de vendas Conversor de moedas Receba do seu cliente em moeda estrangeira Get Store Automatize o seu negócio Pix Receba suas vendas em segundos Empréstimo Faça o seu negócio decolar Crediário Parcelamento em até 48x Pagamentos recorrentes Venda com mensalidade Mundo Open Escolha como economizar Split Simplifique a divisão de vendas Conversor de moedas Receba do seu cliente em moeda estrangeira Get Store Automatize o seu negócio Mais Soluções Hidden title Solução TEF Automação de ponta a ponta POS TEF Flexibilidade para vender Conciliador Gestão financeira inteligente Ofertas TEF Gestão financeira inteligente Hidden title Recarga de celular Mais comodidade para seu cliente Portal do cartão BNDES A vitrine virtual do seu negócio Hidden title Solução TEF Automação de ponta a ponta POS TEF Flexibilidade para vender",
-    "source": "https://site.getnet.com.br/link-de-pagamento/",
-    "title": "Getnet | Link de Pagamento: venda mais online | Getnet"
-  },
-  {
-    "text": "Conciliador Gestão financeira inteligente Ofertas TEF Gestão financeira inteligente Solução TEF Automação de ponta a ponta POS TEF Flexibilidade para vender Conciliador Gestão financeira inteligente Ofertas TEF Gestão financeira inteligente Hidden title Recarga de celular Mais comodidade para seu cliente Portal do cartão BNDES A vitrine virtual do seu negócio Recarga de celular Mais comodidade para seu cliente Portal do cartão BNDES A vitrine virtual do seu negócio Get Ajuda Saiba mais Hidden title Get Code Nossa História Parcerias Patrocínios Carreiras Imprensa Hidden title Get Code Nossa História Parcerias Patrocínios Carreiras Imprensa Get Code Nossa História Parcerias Patrocínios Carreiras Imprensa Blog Já sou cliente Get Atendimento - 06h00 às 22h00 Capitais e regiões metropolitanas 4002-4000 ou 4003-4000 Interior e Demais localidades 0800-648-8000 Fale no WhatsApp Fale conosco",
-    "source": "https://site.getnet.com.br/link-de-pagamento/",
-    "title": "Getnet | Link de Pagamento: venda mais online | Getnet"
-  },
-  {
-    "text": "Central de ajuda Minha Conta BAIXAR APP GETNET BRASIL Capitais e regiões metropolitanas 4002-4000 ou 4003-4000 Interior e Demais localidades 0800-648-8000 Fale no WhatsApp Fale conosco Central de ajuda Minha Conta BAIXAR APP GETNET BRASIL Baixe o App Getnet Brasil Aponte a câmera do seu celular: Ou acesse pelas lojas: Pelo site, rápido e fácil Cadastro sem produto Você não precisa ter um de nossos produtos para se cadastrar. Sou Pessoa Jurídica As melhores ofertas para o seu CNPJ Sou Pessoa Física As melhores ofertas para o seu CPF Cadastro sem produto Você não precisa ter um de nossos produtos para se cadastrar. Sou Pessoa Jurídica As melhores ofertas para o seu CNPJ Sou Pessoa Física As melhores ofertas para o seu CPF Atendimento Pelo WhatsApp Fale com um de nossos especialistas Pelo telefone Ligue 4002-4000 Pelo WhatsApp Fale com um de nossos especialistas Pelo telefone Ligue",
-    "source": "https://site.getnet.com.br/link-de-pagamento/",
-    "title": "Getnet | Link de Pagamento: venda mais online | Getnet"
-  },
-  {
-    "text": "4002-4000 Venda sem complicação com Link de Pagamento Getnet, é mais negócio Link personalizável Segurança antifraude Venda online Aceite débito, crédito, pix e boleto Link de pagamento com benefícios para você e seu cliente. Com Getnet, dá negócio Venda online de forma prática e segura com Link de Pagamento Simule o recebimento das suas vendas com o Link de Pagamento Veja como é fácil vender com o Link de Pagamento Acesse o Portal Minha Conta Crie seu Link de Pagamento Configure Pronto para vender Dúvidas sobre Link de Pagamento? Adquira nossos produtos e impulsione suas vendas​​ Tenha suporte:",
-    "source": "https://site.getnet.com.br/link-de-pagamento/",
-    "title": "Getnet | Link de Pagamento: venda mais online | Getnet"
-  },
-  {
-    "text": "Já sou cliente Get Atendimento - 06h00 às 22h00 Capitais e regiões metropolitanas 4002-4000 ou 4003-4000 Interior e Demais localidades 0800-648-8000 Fale no WhatsApp Fale conosco Central de ajuda Minha Conta BAIXAR APP GETNET BRASIL Capitais e regiões metropolitanas 4002-4000 ou 4003-4000 Interior e Demais localidades 0800-648-8000 Fale no WhatsApp Fale conosco Central de ajuda Minha Conta BAIXAR APP GETNET BRASIL Baixe o App Getnet Brasil Aponte a câmera do seu celular: Ou acesse pelas lojas: Pelo site, rápido e fácil Cadastro sem produto Você não precisa ter um de nossos produtos para se cadastrar. Sou Pessoa Jurídica As melhores ofertas para o seu CNPJ Sou Pessoa Física As melhores ofertas para o seu CPF Cadastro sem produto Você não precisa ter um de nossos produtos para se cadastrar. Sou Pessoa Jurídica As melhores ofertas para o seu CNPJ Sou Pessoa Física As melhores ofertas para o",
-    "source": "https://site.getnet.com.br/pix/",
-    "title": "Pix - Getnet"
-  },
-  {
-    "text": "seu CPF Atendimento Pelo WhatsApp Fale com um de nossos especialistas Pelo telefone Ligue 4002-4000 Pelo WhatsApp Fale com um de nossos especialistas Pelo telefone Ligue 4002-4000 Produtos Taxas especiais para PJ Você que vende R$5mil/mês ganhe taxas personalizadas e aluguel grátis. SIMULE SUAS TAXAS Para o seu negócio Maquininhas Comece a vender agora Gestão de Vendas Integre sua loja do pedido ao estoque Get Tap O seu celular vira uma maquininha Link de Pagamento Venda pelas redes sociais Checkout de Pagamentos Soluções completas para vendas online Get Conta Conta digital e cartão grátis Facilite a sua rotina Pix Receba suas vendas em segundos Empréstimo Faça o seu negócio decolar Crediário Parcelamento em até 48x Pagamentos recorrentes Venda com mensalidade Mundo Open Escolha como economizar Split Simplifique a divisão de vendas Conversor de moedas Receba do seu cliente em moeda",
-    "source": "https://site.getnet.com.br/pix/",
-    "title": "Pix - Getnet"
-  },
-  {
-    "text": "estrangeira Get Store Automatize o seu negócio Taxas especiais para PJ Você que vende R$5mil/mês ganhe taxas personalizadas e aluguel grátis. SIMULE SUAS TAXAS Para o seu negócio Maquininhas Comece a vender agora Gestão de Vendas Integre sua loja do pedido ao estoque Get Tap O seu celular vira uma maquininha Link de Pagamento Venda pelas redes sociais Checkout de Pagamentos Soluções completas para vendas online Get Conta Conta digital e cartão grátis Maquininhas Comece a vender agora Gestão de Vendas Integre sua loja do pedido ao estoque Get Tap O seu celular vira uma maquininha Link de Pagamento Venda pelas redes sociais Checkout de Pagamentos Soluções completas para vendas online Get Conta Conta digital e cartão grátis Facilite a sua rotina Pix Receba suas vendas em segundos Empréstimo Faça o seu negócio decolar Crediário Parcelamento em até 48x Pagamentos recorrentes Venda com",
-    "source": "https://site.getnet.com.br/pix/",
-    "title": "Pix - Getnet"
-  },
-  {
-    "text": "mensalidade Mundo Open Escolha como economizar Split Simplifique a divisão de vendas Conversor de moedas Receba do seu cliente em moeda estrangeira Get Store Automatize o seu negócio Pix Receba suas vendas em segundos Empréstimo Faça o seu negócio decolar Crediário Parcelamento em até 48x Pagamentos recorrentes Venda com mensalidade Mundo Open Escolha como economizar Split Simplifique a divisão de vendas Conversor de moedas Receba do seu cliente em moeda estrangeira Get Store Automatize o seu negócio Mais Soluções Hidden title Solução TEF Automação de ponta a ponta POS TEF Flexibilidade para vender Conciliador Gestão financeira inteligente Ofertas TEF Gestão financeira inteligente Hidden title Recarga de celular Mais comodidade para seu cliente Portal do cartão BNDES A vitrine virtual do seu negócio Hidden title Solução TEF Automação de ponta a ponta POS TEF Flexibilidade para vender",
-    "source": "https://site.getnet.com.br/pix/",
-    "title": "Pix - Getnet"
-  },
-  {
-    "text": "Conciliador Gestão financeira inteligente Ofertas TEF Gestão financeira inteligente Solução TEF Automação de ponta a ponta POS TEF Flexibilidade para vender Conciliador Gestão financeira inteligente Ofertas TEF Gestão financeira inteligente Hidden title Recarga de celular Mais comodidade para seu cliente Portal do cartão BNDES A vitrine virtual do seu negócio Recarga de celular Mais comodidade para seu cliente Portal do cartão BNDES A vitrine virtual do seu negócio Get Ajuda Saiba mais Hidden title Get Code Nossa História Parcerias Patrocínios Carreiras Imprensa Hidden title Get Code Nossa História Parcerias Patrocínios Carreiras Imprensa Get Code Nossa História Parcerias Patrocínios Carreiras Imprensa Blog Já sou cliente Get Atendimento - 06h00 às 22h00 Capitais e regiões metropolitanas 4002-4000 ou 4003-4000 Interior e Demais localidades 0800-648-8000 Fale no WhatsApp Fale conosco",
-    "source": "https://site.getnet.com.br/pix/",
-    "title": "Pix - Getnet"
-  },
-  {
-    "text": "Central de ajuda Minha Conta BAIXAR APP GETNET BRASIL Capitais e regiões metropolitanas 4002-4000 ou 4003-4000 Interior e Demais localidades 0800-648-8000 Fale no WhatsApp Fale conosco Central de ajuda Minha Conta BAIXAR APP GETNET BRASIL Baixe o App Getnet Brasil Aponte a câmera do seu celular: Ou acesse pelas lojas: Pelo site, rápido e fácil Cadastro sem produto Você não precisa ter um de nossos produtos para se cadastrar. Sou Pessoa Jurídica As melhores ofertas para o seu CNPJ Sou Pessoa Física As melhores ofertas para o seu CPF Cadastro sem produto Você não precisa ter um de nossos produtos para se cadastrar. Sou Pessoa Jurídica As melhores ofertas para o seu CNPJ Sou Pessoa Física As melhores ofertas para o seu CPF Atendimento Pelo WhatsApp Fale com um de nossos especialistas Pelo telefone Ligue 4002-4000 Pelo WhatsApp Fale com um de nossos especialistas Pelo telefone Ligue",
-    "source": "https://site.getnet.com.br/pix/",
-    "title": "Pix - Getnet"
-  },
-  {
-    "text": "4002-4000 Aproximação Biometria* Novo Get Tap no celular QR Code na maquinninha Dica: mantenha os dados de cadastro na Getnet sempre atualizados! Saiba mais sobre o pagamento com Biometria via Pix. Preencha o formulário para que nossos especialistas entrem em contato com você. Já é cliente Getnet? Sim Não Ao clicar em enviar, você declara que leu e concorda integralmente com os termos da Política de Privacidade da Getnet Venda mais com Pix A Getnet tem soluções físicas e digitais para o seu negócio Maquininhas Link de pagamento Get Tap E-commerce TEF Fazer parte da Getnet é garantir a segurança para as suas vendas! Aproveite para utilizar o Aplicativo Getnet Brasil para facilitar o seu dia a dia e turbinar o seu negócio. Aponte a câmera do seu celular para o QR code ao lado ou clique nos botões abaixo, e baixe agora mesmo. *O horário de recebimento do Pix pode variar em até um dia",
-    "source": "https://site.getnet.com.br/pix/",
-    "title": "Pix - Getnet"
+    "title": "Getnet | Getnet, uma empresa do grupo Santander",
+    "curated": false
   },
   {
     "text": "corrido, dependendo do modelo de Pix o qual o cliente é elegível e do horário de aprovação da venda. Tire todas as suas dúvidas Adquira nossos produtos e impulsione suas vendas​​ Tenha suporte:",
     "source": "https://site.getnet.com.br/pix/",
-    "title": "Pix - Getnet"
+    "title": "Pix - Getnet",
+    "curated": false
   },
   {
     "text": "Quando vale a pena antecipar as suas vendas no cartão? Entenda como funciona a antecipação de recebíveis e em quais situações ela pode ser uma aliada do seu negócio. Publicado por Getnet Manter o caixa equilibrado é um dos maiores desafios para quem empreende. Quando os valores das vendas parceladas no cartão de crédito vão sendo recebidos ao longo do tempo, pagar fornecedores, cobrir despesas fixas ou aproveitar uma boa oportunidade de compra pode se tornar um problema. A antecipação de recebíveis existe para resolver exatamente isso. Com ela, o empreendedor acessa antes do prazo o dinheiro das vendas já realizadas no crédito. Mas quando essa escolha realmente vale a pena? Neste artigo, você vai ver: O que é a antecipação de recebíveis no cartão de crédito Em quais situações a antecipação pode ser uma boa decisão Quando a antecipação pode não valer a pena Principais cuidados antes de",
     "source": "https://site.getnet.com.br/quando-vale-a-pena-antecipar-as-suas-vendas-no-cartao/",
-    "title": "Quando vale a pena antecipar as suas vendas no cartão? - Getnet"
+    "title": "Quando vale a pena antecipar as suas vendas no cartão? - Getnet",
+    "curated": false
   },
   {
     "text": "antecipar vendas no cartão Como avaliar taxas, prazos e impacto no caixa do negócio Como antecipar vendas de forma simples pelo app Getnet Brasil O que é a antecipação de recebíveis? Quando você realiza vendas no crédito, seja à vista ou de forma parcelada, os recebimentos dos valores ficam agendados para datas futuras. A antecipação de recebíveis é a possibilidade de receber esse dinheiro antes do prazo original, mediante uma taxa cobrada pela operadora ou instituição financeira. Quando vale a pena antecipar? A antecipação pode ser uma grande aliada, desde que usada no momento certo. Veja as situações em que ela faz mais sentido. Necessidade de capital de giro Se o seu negócio precisa de dinheiro para pagar fornecedores, funcionários ou contas do dia a dia, a antecipação evita que você recorra a empréstimos com juros mais altos, como o cheque especial ou o crédito rotativo. Oportunidade",
     "source": "https://site.getnet.com.br/quando-vale-a-pena-antecipar-as-suas-vendas-no-cartao/",
-    "title": "Quando vale a pena antecipar as suas vendas no cartão? - Getnet"
+    "title": "Quando vale a pena antecipar as suas vendas no cartão? - Getnet",
+    "curated": false
   },
   {
     "text": "de compra com desconto Às vezes, um fornecedor oferece condições especiais para pagamento à vista. Se o desconto na compra for maior do que a taxa de antecipação, o negócio pode ser muito vantajoso. Datas de alto volume de vendas Após períodos como Black Friday, Natal ou Dia das Mães, o volume de vendas parceladas costuma aumentar muito. Antecipar esse recebimento pode ajudar a repor o estoque rapidamente e aproveitar o momento. Evitar inadimplência nas suas próprias contas Pagar boletos em atraso gera multas e juros. Se a antecipação evitar esse custo, ela pode compensar e ainda preservar o seu histórico financeiro. Quando a antecipação pode não valer a pena? Assim como qualquer ferramenta financeira, a antecipação tem um custo e nem sempre é a melhor escolha. Fique atento a estas situações. Se o seu caixa está equilibrado e não há urgência no recebimento, esperar pode ser mais",
     "source": "https://site.getnet.com.br/quando-vale-a-pena-antecipar-as-suas-vendas-no-cartao/",
-    "title": "Quando vale a pena antecipar as suas vendas no cartão? - Getnet"
+    "title": "Quando vale a pena antecipar as suas vendas no cartão? - Getnet",
+    "curated": false
   },
   {
     "text": "rentável. Da mesma forma, se a taxa cobrada for muito alta em relação ao benefício que o valor antecipado vai gerar, pode não compensar. E quando a antecipação vira um hábito sem planejamento, ela pode comprimir a sua margem de lucro ao longo do tempo. A dica é simples. Antes de antecipar, faça as contas e compare o custo da antecipação com o custo de não ter o dinheiro agora. O que avaliar antes de antecipar? Para tomar uma decisão consciente, alguns pontos merecem atenção. O primeiro é a taxa de antecipação, ou seja, qual é o percentual cobrado por dia ou por mês. O segundo é o prazo dos recebíveis, já que quanto mais distante a data de recebimento, maior tende a ser o custo. Também vale verificar o valor real que você vai receber depois do desconto da taxa e se ele ainda resolve o seu problema. Por último, considere se existe outra forma de cobrir essa necessidade com um custo menor.",
     "source": "https://site.getnet.com.br/quando-vale-a-pena-antecipar-as-suas-vendas-no-cartao/",
-    "title": "Quando vale a pena antecipar as suas vendas no cartão? - Getnet"
+    "title": "Quando vale a pena antecipar as suas vendas no cartão? - Getnet",
+    "curated": false
   },
   {
     "text": "Como antecipar suas vendas com facilidade pelo app Getnet Brasil A boa notícia é que você não precisa de burocracia para antecipar seus recebíveis. É possível antecipar o recebimento das vendas realizadas no crédito, à vista ou parcelado, diretamente pelo aplicativo Getnet Brasil , disponível para Android e iOS , de forma simples, rápida e sem sair de onde estiver. Com poucos toques na tela, você consulta os valores disponíveis para antecipação, simula o custo e decide se faz sentido para o seu momento. Tudo na palma da mão, com a transparência e a segurança que o seu negócio merece. Clique aqui e veja como antecipar as suas vendas pelo nosso App. FAQs – Perguntas frequentes sobre antecipação de recebíveis O que são recebíveis de cartão de crédito? Recebíveis são os valores das vendas realizadas no cartão de crédito que ainda não caíram na conta do lojista. Normalmente, eles ficam",
     "source": "https://site.getnet.com.br/quando-vale-a-pena-antecipar-as-suas-vendas-no-cartao/",
-    "title": "Quando vale a pena antecipar as suas vendas no cartão? - Getnet"
+    "title": "Quando vale a pena antecipar as suas vendas no cartão? - Getnet",
+    "curated": false
   },
   {
     "text": "agendados para recebimento em datas futuras, principalmente em vendas parceladas. A antecipação de recebíveis é um tipo de empréstimo? Não exatamente. Na antecipação, o lojista recebe antes um valor que já é dele, proveniente de vendas realizadas. Diferente de um empréstimo, não há contratação de uma nova dívida, mas sim o adiantamento de um recurso futuro mediante taxa. Toda venda no cartão pode ser antecipada? Vendas no crédito, à vista ou parceladas, podem ser antecipadas, desde que estejam elegíveis dentro da solução contratada. A antecipação afeta a margem de lucro do negócio? Pode afetar, sim, já que há cobrança de taxa. Por isso, é importante avaliar se o benefício de ter o dinheiro agora, como evitar juros maiores ou aproveitar descontos compensa o custo da antecipação. É possível simular o valor antes de antecipar? Sim. No app Getnet Brasil, o lojista pode consultar os",
     "source": "https://site.getnet.com.br/quando-vale-a-pena-antecipar-as-suas-vendas-no-cartao/",
-    "title": "Quando vale a pena antecipar as suas vendas no cartão? - Getnet"
+    "title": "Quando vale a pena antecipar as suas vendas no cartão? - Getnet",
+    "curated": false
   },
   {
     "text": "recebíveis disponíveis, simular a antecipação e visualizar o valor líquido antes de confirmar a operação, tudo de forma transparente. Conclusão – Mais controle do caixa, na hora certa Antecipar vendas no cartão pode ser o empurrão que o seu negócio precisa para manter o caixa em dia, aproveitar oportunidades e crescer com mais segurança. O segredo está em usar essa solução com planejamento, avaliando custos e benefícios em cada momento. Com a antecipação da Getnet, essa decisão fica muito mais simples. Pelo app Getnet Brasil, você simula, antecipa e acompanha tudo em poucos cliques, com transparência e total controle. Mais do que receber antes, é ter liberdade para cuidar melhor do financeiro e fazer o seu negócio avançar! Recentes",
     "source": "https://site.getnet.com.br/quando-vale-a-pena-antecipar-as-suas-vendas-no-cartao/",
-    "title": "Quando vale a pena antecipar as suas vendas no cartão? - Getnet"
+    "title": "Quando vale a pena antecipar as suas vendas no cartão? - Getnet",
+    "curated": false
   }
 ]
