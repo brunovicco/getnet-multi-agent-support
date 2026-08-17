@@ -13,12 +13,12 @@ become requirements.
 ## D2 — Rules first, model second, in the router
 
 **Chosen:** deterministic rules as the default and permanent fallback; an optional LLM classifier
-that takes precedence when configured.
+that only breaks non-guardrail ties below the reviewed rule-confidence threshold.
 **Rejected:** LLM-only routing, and rules-only routing.
 **Why:** LLM-only routing cannot run without credentials, is non-reproducible in CI, and adds
 latency and cost to a decision that is often trivial. Rules-only routing overfits to the phrasing
-of whoever wrote them. Two layers behind one contract give a working credential-free path and a
-generalizing path, with the guardrails never delegated.
+of whoever wrote them. Spending the model only on the ambiguous tail gives a working
+credential-free path and a generalizing path, with the guardrails never delegated.
 **Cost accepted:** two implementations of the same contract must be evaluated by the same dataset.
 
 ## D3 — TF-IDF instead of embeddings
@@ -42,8 +42,10 @@ the credential-free path. Storing both keeps retrieval deterministic and keeps c
 **Chosen:** a fourth agent owning every stop condition (low confidence, guardrail, unknown user,
 insufficient evidence).
 **Rejected:** returning an error, or letting each agent write its own refusal.
-**Why:** a single owner means one place to change handoff wording, one place to attach the handoff
-reference, and one observable route for measuring the automated-resolution rate.
+**Why:** a single policy owner means one place to change handoff wording and one orchestrator seam
+to attach the trace-derived reference even when a specialized agent detects the stop condition.
+The reference is emitted as safe metadata and the final route remains observable for measuring the
+automated-resolution rate.
 
 ## D6 — Sequences triggered by intent composition, not score proximity
 

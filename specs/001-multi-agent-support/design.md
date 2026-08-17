@@ -19,7 +19,8 @@ flowchart TD
     API --> Orchestrator
     Orchestrator --> Router
     Router -->|rules| Decision
-    Router -.->|optional, non-guardrail only| LLMClassifier
+    Router -.->|optional, ambiguous non-guardrail tail| LLMClassifier
+    LLMClassifier -.-> Decision
     Decision --> Knowledge
     Decision --> Support
     Decision --> Escalation
@@ -44,8 +45,8 @@ Two independent layers:
    is what makes paraphrase survive: a device term plus a fault term routes to support even for a
    sentence nobody anticipated. Phrase-only rules overfit to the exact examples in a brief.
 2. **Classifier layer (optional).** `IntentClassifierPort` with an OpenAI structured-output adapter.
-   It is consulted only when no guardrail fired (REQ-R5) and returns `None` on any failure, so the
-   rule decision stands (REQ-R4).
+   It is consulted only when no guardrail fired (REQ-R5) and rule confidence is below `0.75`.
+   It returns `None` on any failure, so the rule decision stands (REQ-R4).
 
 Confidence is a documented monotonic heuristic (`score_to_confidence`), not a calibrated
 probability. Calibration against the offline dataset is tracked in `docs/EVALUATION.md`.
@@ -53,7 +54,8 @@ probability. Calibration against the offline dataset is tracked in `docs/EVALUAT
 **Sequence trigger (REQ-R6).** A sequence runs only when a support-incident rule fired *and* a
 product-topic term is present. Score proximity alone is rejected as a trigger: "maquininha" is both
 a device word and a product word, so a score-based rule would append marketing text to every
-incident answer.
+incident answer. A handoff raised by either agent owns the combined outcome, while both answers,
+sources, and tool counts remain observable.
 
 ## Knowledge agent (REQ-K1..K5)
 
@@ -92,12 +94,14 @@ apart. No model is on this path.
 
 ## Language (REQ-L1)
 
-`application/language.py` holds lexical detection plus a bilingual catalogue. Response text is not
-inlined in agents, so adding a language is a catalogue change rather than an agent change.
+`application/language.py` holds lexical detection plus bilingual catalogues for response templates
+and typed tool values. Response text is not inlined in agents, so adding a language is a catalogue
+change rather than an agent change.
 
 ## Security boundaries
 
 * `user_id` is trusted only as a lookup key; production must derive it from an authenticated
   identity.
 * Retrieved and external content is untrusted; the generation prompt states this explicitly.
-* Logs carry metadata and a namespaced `user_reference_hash` (pseudonymization, not anonymization).
+* Logs carry metadata, a request-scoped handoff reference when applicable, and a namespaced
+  `user_reference_hash` (pseudonymization, not anonymization).

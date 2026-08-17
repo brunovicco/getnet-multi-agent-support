@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     llm_model: str = "gpt-5.6-luna"
     llm_base_url: str = "https://api.openai.com"
     llm_timeout_seconds: float = 20.0
-    # Opt-in: use the model as the primary router, keeping rules as the fallback.
+    # Opt-in: use the model only as a tie-breaker when deterministic rules are uncertain.
     llm_router_enabled: bool = False
     # Routing sits on the chat request path, so its budget is much tighter than generation's:
     # exceeding it must cost a fallback to rules, not a slow response.

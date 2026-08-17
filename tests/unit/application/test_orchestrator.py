@@ -13,8 +13,8 @@ from getnet_support.application.agents.customer_support import CustomerSupportAg
 from getnet_support.application.agents.escalation import EscalationAgent
 from getnet_support.application.agents.knowledge import KnowledgeAgent
 from getnet_support.application.agents.router import RouterAgent
-from getnet_support.application.orchestrator import SupportOrchestrator
-from getnet_support.domain.models import AgentName, RouteName
+from getnet_support.application.orchestrator import SupportOrchestrator, _merge_sequence
+from getnet_support.domain.models import AgentName, AgentResult, RouteName
 
 
 class RecordingEvents:
@@ -99,6 +99,63 @@ async def test_incident_with_a_product_topic_runs_an_agent_sequence() -> None:
 
 
 @pytest.mark.asyncio
+async def test_agent_sequence_preserves_an_unknown_customer_handoff() -> None:
+    """REQ-R6, REQ-S3: a successful product answer must not hide a support handoff."""
+    events = RecordingEvents()
+
+    result = await build_orchestrator(events).chat(
+        message="Minha maquininha não conecta e como funciona a antecipação?",
+        user_id="desconhecido999",
+        trace_id="mixed-intent-trace",
+    )
+
+    assert result.agent is AgentName.ESCALATION
+    assert result.route is RouteName.AGENT_SEQUENCE
+    assert result.handoff_required is True
+    assert "Nenhum cliente foi encontrado" in result.answer
+    assert "HO-" in result.answer
+    execution = next(fields for event, fields in events.events if event == "agent_execution")
+    assert execution["handoff_required"] is True
+    reference = execution["handoff_reference"]
+    assert isinstance(reference, str)
+    assert reference in result.answer
+
+
+@pytest.mark.parametrize(
+    ("primary_handoff", "secondary_handoff"),
+    [(True, False), (False, True), (True, True)],
+)
+def test_sequence_merge_preserves_every_handoff_combination(
+    primary_handoff: bool,
+    secondary_handoff: bool,
+) -> None:
+    primary = AgentResult(
+        answer="primary",
+        agent=AgentName.ESCALATION if primary_handoff else AgentName.KNOWLEDGE,
+        route=RouteName.HUMAN_HANDOFF if primary_handoff else RouteName.GETNET_RAG,
+        handoff_required=primary_handoff,
+        tool_calls=1,
+        retrieval_result_count=1,
+    )
+    secondary = AgentResult(
+        answer="secondary",
+        agent=AgentName.ESCALATION if secondary_handoff else AgentName.SUPPORT,
+        route=RouteName.HUMAN_HANDOFF if secondary_handoff else RouteName.CUSTOMER_TOOLS,
+        handoff_required=secondary_handoff,
+        tool_calls=2,
+    )
+
+    result = _merge_sequence(primary, secondary)
+
+    assert result.agent is AgentName.ESCALATION
+    assert result.route is RouteName.AGENT_SEQUENCE
+    assert result.handoff_required is True
+    assert result.answer == "primary secondary"
+    assert result.tool_calls == 3
+    assert result.retrieval_result_count == 1
+
+
+@pytest.mark.asyncio
 async def test_escalation_carries_a_handoff_reference_in_the_user_language() -> None:
     """REQ-E1, REQ-L1: the handoff is correlatable and written in Portuguese."""
     result = await build_orchestrator(RecordingEvents()).chat(
@@ -122,6 +179,34 @@ async def test_unknown_customer_is_handed_off_without_disclosure() -> None:
 
     assert result.handoff_required is True
     assert "GET-12345" not in result.answer
+    assert "HO-" in result.answer
+
+
+@pytest.mark.asyncio
+async def test_handoff_reference_is_stable_per_request_and_unique_between_requests() -> None:
+    orchestrator = build_orchestrator(RecordingEvents())
+
+    first = await orchestrator.chat(
+        message="Quero transferir dinheiro da minha conta",
+        user_id="cliente1988",
+        trace_id="request-one",
+    )
+    repeated = await orchestrator.chat(
+        message="Quero transferir dinheiro da minha conta",
+        user_id="cliente1988",
+        trace_id="request-one",
+    )
+    second = await orchestrator.chat(
+        message="Quero transferir dinheiro da minha conta",
+        user_id="cliente1988",
+        trace_id="request-two",
+    )
+
+    first_reference = first.answer.split("HO-", maxsplit=1)[1][:8]
+    repeated_reference = repeated.answer.split("HO-", maxsplit=1)[1][:8]
+    second_reference = second.answer.split("HO-", maxsplit=1)[1][:8]
+    assert first_reference == repeated_reference
+    assert first_reference != second_reference
 
 
 @pytest.mark.asyncio

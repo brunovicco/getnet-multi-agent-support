@@ -14,7 +14,7 @@ dependency chain, not the elapsed time.
 | 7 | Retrieval with score and term-coverage gates | REQ-K1, REQ-K2 | `tests/unit/application/test_knowledge_grounding.py` |
 | 8 | Web-search port with explicit unavailable result | REQ-K3 | `tests/unit/adapters/test_web_search.py` |
 | 9 | Customer tools scoped by `user_id` | REQ-S1, REQ-S2, REQ-S3 | `tests/unit/adapters/test_customer_tools.py` |
-| 10 | Escalation agent with handoff reference | REQ-E1 | `tests/unit/application/test_agents.py` |
+| 10 | Escalation agent with request-scoped handoff reference | REQ-E1 | `tests/unit/application/test_orchestrator.py` |
 | 11 | Bilingual response catalogue | REQ-L1 | `tests/unit/application/test_language.py` |
 | 12 | Orchestrator, including the agent sequence | REQ-R6, REQ-O1 | `tests/unit/application/test_orchestrator.py` |
 | 13 | FastAPI boundary, health, validation | REQ-A1, REQ-A2, REQ-A3 | `tests/integration/test_api.py` |

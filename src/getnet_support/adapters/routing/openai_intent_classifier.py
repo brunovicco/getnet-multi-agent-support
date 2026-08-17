@@ -1,4 +1,4 @@
-"""Optional OpenAI structured-output adapter used as the primary intent classifier.
+"""Optional OpenAI structured-output adapter used as an ambiguous-tail intent tie-breaker.
 
 The deterministic rule set remains the fallback: any provider, network, schema, or validation
 failure returns ``None`` so the application keeps a working, credential-free routing path.

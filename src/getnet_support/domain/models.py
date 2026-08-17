@@ -119,6 +119,7 @@ class AgentResult:
     route: RouteName
     sources: tuple[Source, ...] = ()
     handoff_required: bool = False
+    handoff_reference: str | None = None
     tool_calls: int = 0
     retrieval_result_count: int = 0
 
