@@ -25,8 +25,9 @@ and terminal status. Monetary values use `Decimal`; timestamps are timezone-awar
 
 ### Application
 
-`SupportOrchestrator` is the chat use case. It calls `RouterAgent` and exactly one specialized
-agent. Protocol ports keep retrieval, search, answer generation, customer data, and events
+`SupportOrchestrator` is the chat use case. It calls `RouterAgent` and normally one specialized
+agent. A message combining a customer incident with a public product topic runs a bounded two-agent
+sequence. Protocol ports keep retrieval, search, answer generation, customer data, and events
 replaceable. There is no implicit global agent state.
 
 ### Adapters
@@ -49,12 +50,18 @@ sequenceDiagram
     participant A as FastAPI
     participant O as Orchestrator
     participant R as RouterAgent
+    participant M as Optional Classifier
     participant S as Specialized Agent
+    participant S2 as Optional Secondary Agent
     participant T as Tool/Adapter
 
     C->>A: POST /chat
     A->>O: message, user_id, trace_id
     O->>R: route(message)
+    opt rules below 0.75 and classifier enabled
+        R->>M: classify(message)
+        M-->>R: decision or fallback
+    end
     R-->>O: agent, reason, confidence
     alt confidence below threshold or guardrail
         O->>S: EscalationAgent.handle
@@ -66,8 +73,14 @@ sequenceDiagram
             S->>T: generate(question, retrieved evidence)
             T-->>S: grounded answer or local fallback
         end
+        opt incident plus public product topic
+            O->>S2: handle typed input
+            S2-->>O: secondary AgentResult
+        end
     end
     S-->>O: AgentResult
+    O->>O: merge sequence and preserve any handoff
+    O->>O: attach request-scoped handoff reference
     O-->>A: ChatResult
     A-->>C: ChatResponse
 ```

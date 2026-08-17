@@ -8,8 +8,36 @@ from getnet_support.domain.models import KnowledgeChunk
 from getnet_support.entrypoints.http import create_app
 
 
+def local_settings(
+    *,
+    getnet_corpus_path: Path | None = None,
+    web_search_provider: str = "",
+    web_search_api_key: str = "",
+    llm_provider: str = "",
+    llm_api_key: str = "",
+    llm_router_enabled: bool = False,
+) -> Settings:
+    if getnet_corpus_path is not None:
+        return Settings(
+            getnet_corpus_path=getnet_corpus_path,
+            web_search_provider=web_search_provider,
+            web_search_api_key=web_search_api_key,
+            llm_provider=llm_provider,
+            llm_api_key=llm_api_key,
+            llm_router_enabled=llm_router_enabled,
+        )
+
+    return Settings(
+        web_search_provider=web_search_provider,
+        web_search_api_key=web_search_api_key,
+        llm_provider=llm_provider,
+        llm_api_key=llm_api_key,
+        llm_router_enabled=llm_router_enabled,
+    )
+
+
 def test_root_exposes_service_navigation() -> None:
-    with TestClient(create_app(Settings())) as client:
+    with TestClient(create_app(local_settings())) as client:
         response = client.get("/")
 
     assert response.status_code == 200
@@ -24,7 +52,7 @@ def test_root_exposes_service_navigation() -> None:
 
 
 def test_favicon_does_not_create_a_not_found_error() -> None:
-    with TestClient(create_app(Settings())) as client:
+    with TestClient(create_app(local_settings())) as client:
         response = client.get("/favicon.ico")
 
     assert response.status_code == 204
@@ -32,7 +60,7 @@ def test_favicon_does_not_create_a_not_found_error() -> None:
 
 
 def test_health_reports_local_capabilities() -> None:
-    with TestClient(create_app(Settings())) as client:
+    with TestClient(create_app(local_settings())) as client:
         response = client.get("/health")
 
     assert response.status_code == 200
@@ -47,34 +75,39 @@ def test_health_reports_local_capabilities() -> None:
 
 
 def test_health_reports_configured_optional_providers_without_calling_them() -> None:
-    settings = Settings(
+    settings = local_settings(
         web_search_provider="tavily",
         web_search_api_key="test-web-key",
         llm_provider="openai",
         llm_api_key="test-llm-key",
     )
+
     with TestClient(create_app(settings)) as client:
         response = client.get("/health")
 
+    assert response.status_code == 200
     assert response.json()["web_search"] == "configured"
     assert response.json()["answer_generation"] == "openai"
     assert response.json()["router"] == "rules"
 
 
 def test_health_reports_the_opt_in_llm_router() -> None:
-    settings = Settings(
+    settings = local_settings(
         llm_provider="openai",
         llm_api_key="test-llm-key",
         llm_router_enabled=True,
     )
+
     with TestClient(create_app(settings)) as client:
         response = client.get("/health")
 
+    assert response.status_code == 200
     assert response.json()["router"] == "openai+rules"
 
 
 def test_chat_loads_the_configured_local_corpus(tmp_path: Path) -> None:
     artifact = tmp_path / "custom-corpus.json"
+
     save_corpus(
         artifact,
         (
@@ -88,7 +121,8 @@ def test_chat_loads_the_configured_local_corpus(tmp_path: Path) -> None:
             ),
         ),
     )
-    with TestClient(create_app(Settings(getnet_corpus_path=artifact))) as client:
+
+    with TestClient(create_app(local_settings(getnet_corpus_path=artifact))) as client:
         response = client.post(
             "/chat",
             json={
@@ -105,7 +139,7 @@ def test_chat_loads_the_configured_local_corpus(tmp_path: Path) -> None:
 
 
 def test_chat_routes_support_request() -> None:
-    with TestClient(create_app(Settings())) as client:
+    with TestClient(create_app(local_settings())) as client:
         response = client.post(
             "/chat",
             json={
@@ -122,7 +156,7 @@ def test_chat_routes_support_request() -> None:
 
 
 def test_chat_routes_general_information_to_web_search() -> None:
-    with TestClient(create_app(Settings())) as client:
+    with TestClient(create_app(local_settings())) as client:
         response = client.post(
             "/chat",
             json={
@@ -140,7 +174,13 @@ def test_chat_routes_general_information_to_web_search() -> None:
 
 
 def test_chat_validates_empty_message() -> None:
-    with TestClient(create_app(Settings())) as client:
-        response = client.post("/chat", json={"message": "", "user_id": "cliente1988"})
+    with TestClient(create_app(local_settings())) as client:
+        response = client.post(
+            "/chat",
+            json={
+                "message": "",
+                "user_id": "cliente1988",
+            },
+        )
 
     assert response.status_code == 422

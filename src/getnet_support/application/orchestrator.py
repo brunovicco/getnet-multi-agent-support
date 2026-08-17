@@ -5,7 +5,10 @@ from time import perf_counter
 from uuid import uuid4
 
 from getnet_support.application.agents.customer_support import CustomerSupportAgent
-from getnet_support.application.agents.escalation import EscalationAgent
+from getnet_support.application.agents.escalation import (
+    EscalationAgent,
+    attach_handoff_reference,
+)
 from getnet_support.application.agents.knowledge import KnowledgeAgent
 from getnet_support.application.agents.router import RouterAgent
 from getnet_support.application.ports import EventSink
@@ -57,6 +60,9 @@ class SupportOrchestrator:
                 ),
                 "confidence": decision.confidence,
                 "guardrail": decision.guardrail,
+                # Provenance makes the classifier fallback rate a metric instead of a mystery.
+                "decision_source": decision.source.value,
+                "classifier_latency_ms": decision.classifier_latency_ms,
                 "reason": decision.reason,
             },
         )
@@ -65,18 +71,34 @@ class SupportOrchestrator:
             result = self._escalation.handle(
                 reason="Router confidence below threshold.",
                 message=message,
+                reference_seed=request_trace_id,
             )
         elif decision.agent is AgentName.ESCALATION:
-            result = self._escalation.handle(reason=decision.reason, message=message)
+            result = self._escalation.handle(
+                reason=decision.reason,
+                message=message,
+                reference_seed=request_trace_id,
+            )
         else:
-            result = await self._run_agent(decision.agent, message=message, user_id=user_id)
+            result = await self._run_agent(
+                decision.agent,
+                message=message,
+                user_id=user_id,
+                reference_seed=request_trace_id,
+            )
             if decision.secondary_agent is not None:
                 secondary = await self._run_agent(
                     decision.secondary_agent,
                     message=message,
                     user_id=user_id,
+                    reference_seed=request_trace_id,
                 )
                 result = _merge_sequence(result, secondary)
+        result = attach_handoff_reference(
+            result,
+            message=message,
+            reference_seed=request_trace_id,
+        )
 
         latency_ms = round((perf_counter() - started) * 1000, 2)
         self._events.emit(
@@ -90,6 +112,7 @@ class SupportOrchestrator:
                 "tool_calls": result.tool_calls,
                 "retrieval_result_count": result.retrieval_result_count,
                 "handoff_required": result.handoff_required,
+                "handoff_reference": result.handoff_reference,
             },
         )
         return ChatResult(
@@ -102,49 +125,39 @@ class SupportOrchestrator:
             handoff_required=result.handoff_required,
         )
 
-    async def _run_agent(self, agent: AgentName, *, message: str, user_id: str) -> AgentResult:
+    async def _run_agent(
+        self,
+        agent: AgentName,
+        *,
+        message: str,
+        user_id: str,
+        reference_seed: str,
+    ) -> AgentResult:
         if agent is AgentName.KNOWLEDGE:
             return await self._knowledge.handle(message)
         if agent is AgentName.SUPPORT:
             return await self._support.handle(message, user_id)
-        return self._escalation.handle(reason="Unsupported agent selection.", message=message)
+        return self._escalation.handle(
+            reason="Unsupported agent selection.",
+            message=message,
+            reference_seed=reference_seed,
+        )
 
 
 def _merge_sequence(primary: AgentResult, secondary: AgentResult) -> AgentResult:
     """Combine two agent results into one observable sequence outcome.
 
-    The primary agent keeps ownership of the answer; the secondary agent only appends context.
-    A handoff raised by either agent is preserved so a sequence can never hide an escalation.
+    Both contributions remain visible. A handoff raised by either agent takes ownership of the
+    outcome so a sequence can never hide an escalation behind a successful partial answer.
     """
-    if primary.handoff_required and secondary.handoff_required:
-        return primary
-    if primary.handoff_required:
-        return AgentResult(
-            answer=secondary.answer,
-            agent=secondary.agent,
-            route=RouteName.AGENT_SEQUENCE,
-            sources=secondary.sources,
-            handoff_required=secondary.handoff_required,
-            tool_calls=primary.tool_calls + secondary.tool_calls,
-            retrieval_result_count=(
-                primary.retrieval_result_count + secondary.retrieval_result_count
-            ),
-        )
-    if secondary.handoff_required:
-        return AgentResult(
-            answer=primary.answer,
-            agent=primary.agent,
-            route=RouteName.AGENT_SEQUENCE,
-            sources=primary.sources,
-            tool_calls=primary.tool_calls + secondary.tool_calls,
-            retrieval_result_count=primary.retrieval_result_count,
-        )
+    handoff_required = primary.handoff_required or secondary.handoff_required
     return AgentResult(
         answer=f"{primary.answer} {secondary.answer}".strip(),
-        agent=primary.agent,
+        agent=AgentName.ESCALATION if handoff_required else primary.agent,
         route=RouteName.AGENT_SEQUENCE,
         sources=(*primary.sources, *secondary.sources),
-        handoff_required=False,
+        handoff_required=handoff_required,
+        handoff_reference=primary.handoff_reference or secondary.handoff_reference,
         tool_calls=primary.tool_calls + secondary.tool_calls,
         retrieval_result_count=primary.retrieval_result_count + secondary.retrieval_result_count,
     )

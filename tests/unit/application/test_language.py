@@ -2,7 +2,13 @@
 
 import pytest
 
-from getnet_support.application.language import MESSAGES, detect_language, translate
+from getnet_support.application.language import (
+    MESSAGES,
+    SUPPORT_VALUE_TRANSLATIONS,
+    detect_language,
+    translate,
+    translate_support_value,
+)
 
 
 @pytest.mark.parametrize(
@@ -37,7 +43,20 @@ def test_every_catalogue_entry_covers_both_languages() -> None:
     assert all({"pt", "en"} == set(entry) for entry in MESSAGES.values())
 
 
+def test_every_support_value_translation_covers_both_languages() -> None:
+    assert all(
+        {"pt", "en"} == set(translation)
+        for category in SUPPORT_VALUE_TRANSLATIONS.values()
+        for translation in category.values()
+    )
+
+
 def test_translation_interpolates_values() -> None:
     rendered = translate("support_settlement_date", "pt", date="2026-08-18")
 
     assert "2026-08-18" in rendered
+
+
+def test_support_value_translation_uses_the_requested_language() -> None:
+    assert translate_support_value("settlement_status", "scheduled", "pt") == "agendada"
+    assert translate_support_value("settlement_status", "scheduled", "en") == "scheduled"

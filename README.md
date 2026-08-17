@@ -26,11 +26,15 @@ understand, test, and observe.
 ```mermaid
 flowchart TD
     Client --> API
-    API --> Router
-
-    Router --> Knowledge
-    Router --> Support
-    Router --> Escalation
+    API --> Orchestrator
+    Orchestrator --> Router
+    Router -->|rules first| Decision
+    Router -.->|optional ambiguous-tail tie-breaker| LLMClassifier
+    LLMClassifier -.-> Decision
+    Decision --> Knowledge
+    Decision --> Support
+    Decision --> Escalation
+    Decision -->|incident + product topic| Sequence
 
     Knowledge --> GetnetRAG
     Knowledge --> WebSearch
@@ -62,13 +66,16 @@ can be replaced incrementally if workflow durability becomes a real requirement.
 
 1. `POST /chat` validates the message and non-empty `user_id`, then creates a random trace ID.
 2. `RouterAgent` normalizes English and Portuguese text and evaluates centralized weighted intent
-   rules. Sensitive or unsupported actions have guardrail priority.
+   rules. Sensitive or unsupported actions have guardrail priority. When explicitly enabled, the
+   LLM classifier is consulted only for non-guardrail rule decisions below `0.75` confidence.
 3. The orchestrator records the route, reason, and confidence. Confidence below `0.60` is handed
    to `EscalationAgent`.
 4. `KnowledgeAgent` uses local RAG for Getnet product questions and the web-search port for
    general-purpose or time-sensitive questions.
 5. `CustomerSupportAgent` reads account facts only through customer-scoped typed tools.
-6. The selected agent returns a normalized result with route, sources, handoff state, and tool
+6. A message containing both a customer incident and a public product topic runs a short two-agent
+   sequence. A handoff from either agent safely owns the combined outcome.
+7. The selected agent returns a normalized result with route, sources, handoff state, and tool
    counts. The API adds the trace ID and routing confidence.
 
 ## Agents
@@ -78,8 +85,9 @@ can be replaced incrementally if workflow durability becomes a real requirement.
 Uses explicit `IntentRule` values rather than phrase-sized hardcoded answers. Rules model Getnet
 product questions, current information, customer settlements, terminal incidents, sensitive data,
 and unsupported state-changing actions. They are deterministic, injectable, and covered by a
-parameterized regression set. An LLM structured-output router could later be added behind the same
-contract, with these rules retained as the no-credential fallback.
+parameterized regression set. The optional structured-output classifier is a tie-breaker for the
+ambiguous tail, never the hot path or a guardrail authority. Provider failure or low-confidence
+output keeps the deterministic decision.
 
 ### KnowledgeAgent
 
@@ -99,7 +107,9 @@ terminals, balances, or transfers. No model is allowed to create support facts.
 ### EscalationAgent
 
 Handles low confidence, unknown users, unsupported actions, sensitive requests, and insufficient
-RAG evidence. Responses set `handoff_required=true` and disclose no private data.
+RAG evidence. Responses set `handoff_required=true`, disclose no private data, and carry one
+request-scoped `HO-XXXXXXXX` reference derived from the trace ID. Any specialized-agent handoff is
+enriched centrally and the same reference is emitted as metadata for log/CRM correlation.
 
 ## RAG pipeline
 
@@ -249,18 +259,20 @@ WEB_SEARCH_API_KEY=...
 LLM_PROVIDER=openai
 LLM_API_KEY=...
 LLM_MODEL=gpt-5.6-luna
+# Optional: use the model only as an ambiguous-tail routing tie-breaker.
+LLM_ROUTER_ENABLED=false
 ```
 
-Tavily is used only for questions classified as requiring current external information. OpenAI is
-used only after local Getnet retrieval succeeds; the evidence and user question are sent to the
-configured provider, while source attribution remains application-owned.
+Tavily is used for general-purpose and current external questions. OpenAI generation is used only
+after local Getnet retrieval succeeds; the evidence and user question are sent to the configured
+provider, while source attribution remains application-owned.
 
-The LLM is deliberately not responsible for routing or customer facts. Its single optional role
-is to synthesize a clearer product answer from the top retrieved chunk. The system instruction
-treats retrieved text as untrusted evidence, prohibits unsupported claims and fabricated
-citations, asks for the user's language, and requires an insufficient-evidence response when the
-context cannot support an answer. Provider errors return `None` to the application port, which
-activates the deterministic extractive response.
+The LLM is never responsible for guardrails or customer facts. Its two optional roles are breaking
+ambiguous routing ties and synthesizing a clearer product answer from retrieved evidence. The
+generation instruction treats retrieved text as untrusted evidence, prohibits unsupported claims
+and fabricated citations, asks for the user's language, and requires an insufficient-evidence
+response when the context cannot support an answer. Provider errors preserve the rule decision or
+activate the deterministic extractive answer.
 
 ## Docker
 
@@ -290,9 +302,10 @@ The full strategy, including how the orchestration is covered end to end, is in
 
 Tests cover routing, accent normalization, Getnet versus general web knowledge, local retrieval,
 corpus validation, Tavily and OpenAI HTTP contracts, provider failure fallbacks, customer lookup,
-cross-customer transaction isolation, terminal ownership, unknown-user handoff, all three
-orchestration branches, input validation, `/health`, and `/chat`. The integration suite exercises
-the complete HTML -> chunks -> JSON artifact -> index -> retrieval -> grounded response path.
+cross-customer transaction isolation, terminal ownership, unknown-user handoff, handoff-preserving
+agent sequences, localized tool states, input validation, `/health`, and `/chat`. The integration
+suite exercises the complete HTML -> chunks -> JSON artifact -> index -> retrieval -> grounded
+response path.
 
 ## Reliability
 
@@ -316,7 +329,7 @@ Each request gets a trace ID. JSON `structlog` events include:
 - final agent and route;
 - latency in milliseconds;
 - tool-call and retrieval-result counts;
-- handoff state and errors at infrastructure boundaries.
+- handoff state, request-scoped handoff reference, and errors at infrastructure boundaries.
 
 Raw `user_id` values are never emitted. A namespaced SHA-256 digest produces a short, stable
 `user_reference_hash` for correlating a customer's events without exposing their identifier. This

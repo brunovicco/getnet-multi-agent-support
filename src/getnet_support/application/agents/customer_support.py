@@ -8,7 +8,11 @@ from getnet_support.application.agents.router import (
     phrase_matches,
     tokenize_message,
 )
-from getnet_support.application.language import detect_language, translate
+from getnet_support.application.language import (
+    detect_language,
+    translate,
+    translate_support_value,
+)
 from getnet_support.application.ports import (
     CustomerProfileToolPort,
     RecentTransactionsToolPort,
@@ -50,7 +54,13 @@ class CustomerSupportAgent:
 
         needs_terminal = _contains_signal(tokens, TERMINAL_SIGNALS)
         needs_transactions = _contains_signal(tokens, TRANSACTION_SIGNALS)
-        answer_parts = [translate("support_profile_status", language, status=profile.status)]
+        answer_parts = [
+            translate(
+                "support_profile_status",
+                language,
+                status=translate_support_value("customer_status", profile.status, language),
+            )
+        ]
         tool_calls = 1
 
         if needs_transactions:
@@ -62,8 +72,12 @@ class CustomerSupportAgent:
                     translate(
                         "support_latest_sale",
                         language,
-                        status=latest.status,
-                        settlement=latest.settlement_status.replace("_", " "),
+                        status=translate_support_value(
+                            "transaction_status", latest.status, language
+                        ),
+                        settlement=translate_support_value(
+                            "settlement_status", latest.settlement_status, language
+                        ),
                     )
                 )
                 if latest.expected_settlement_at is not None:
@@ -88,8 +102,12 @@ class CustomerSupportAgent:
                         "support_terminal_status",
                         language,
                         terminal=terminal.terminal_id,
-                        connectivity=terminal.connectivity,
-                        diagnostic=terminal.diagnostic,
+                        connectivity=translate_support_value(
+                            "connectivity", terminal.connectivity, language
+                        ),
+                        diagnostic=translate_support_value(
+                            "terminal_diagnostic", terminal.diagnostic, language
+                        ),
                     )
                 )
                 if terminal.connectivity == "disconnected":

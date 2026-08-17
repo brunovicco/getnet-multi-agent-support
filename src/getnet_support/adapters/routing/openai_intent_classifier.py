@@ -1,4 +1,4 @@
-"""Optional OpenAI structured-output adapter used as the primary intent classifier.
+"""Optional OpenAI structured-output adapter used as an ambiguous-tail intent tie-breaker.
 
 The deterministic rule set remains the fallback: any provider, network, schema, or validation
 failure returns ``None`` so the application keeps a working, credential-free routing path.
@@ -70,14 +70,21 @@ class OpenAIIntentClassifier:
         api_key: str,
         model: str,
         base_url: str = "https://api.openai.com",
-        timeout_seconds: float = 10.0,
+        timeout_seconds: float = 2.0,
+        reasoning_effort: str = "none",
         transport: httpx.AsyncBaseTransport | None = None,
     ) -> None:
-        """Configure a bounded, injectable Responses API client."""
+        """Configure a bounded, injectable Responses API client.
+
+        Intent classification of a single sentence does not benefit from deliberation, and this
+        call is on the chat request path, so reasoning effort defaults to the cheapest setting.
+        Providers that reject the parameter simply cause a fallback to the rule layer.
+        """
         self._api_key = api_key
         self._model = model
         self._base_url = base_url.rstrip("/")
         self._timeout_seconds = timeout_seconds
+        self._reasoning_effort = reasoning_effort
         self._transport = transport
 
     async def classify(self, message: str) -> RouteDecision | None:
@@ -101,6 +108,7 @@ class OpenAIIntentClassifier:
                         "input": f"User message:\n{message}",
                         "max_output_tokens": 120,
                         "store": False,
+                        "reasoning": {"effort": self._reasoning_effort},
                         "text": {
                             "format": {
                                 "type": "json_schema",

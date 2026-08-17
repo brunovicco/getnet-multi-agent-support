@@ -8,6 +8,13 @@ provider credentials, and a wrong guess degrades to English rather than to a fai
 from typing import Literal
 
 Language = Literal["pt", "en"]
+SupportValueCategory = Literal[
+    "connectivity",
+    "customer_status",
+    "settlement_status",
+    "terminal_diagnostic",
+    "transaction_status",
+]
 
 _PORTUGUESE_MARKERS: frozenset[str] = frozenset(
     {
@@ -220,8 +227,47 @@ MESSAGES: dict[str, dict[Language, str]] = {
     },
 }
 
+SUPPORT_VALUE_TRANSLATIONS: dict[SupportValueCategory, dict[str, dict[Language, str]]] = {
+    "customer_status": {
+        "active": {"en": "active", "pt": "ativo"},
+    },
+    "transaction_status": {
+        "approved": {"en": "approved", "pt": "aprovada"},
+        "declined": {"en": "declined", "pt": "recusada"},
+    },
+    "settlement_status": {
+        "scheduled": {"en": "scheduled", "pt": "agendada"},
+        "settled": {"en": "settled", "pt": "liquidada"},
+    },
+    "connectivity": {
+        "connected": {"en": "connected", "pt": "conectada"},
+        "disconnected": {"en": "disconnected", "pt": "desconectada"},
+    },
+    "terminal_diagnostic": {
+        "mobile data session is offline": {
+            "en": "mobile data session is offline",
+            "pt": "a sessão de dados móveis está sem conexão",
+        },
+        "no active faults": {
+            "en": "no active faults",
+            "pt": "nenhuma falha ativa",
+        },
+    },
+}
+
 
 def translate(key: str, language: Language, **values: object) -> str:
     """Return a catalogued message, failing loudly on an unknown key during development."""
     template = MESSAGES[key][language]
     return template.format(**values) if values else template
+
+
+def translate_support_value(
+    category: SupportValueCategory,
+    value: str,
+    language: Language,
+) -> str:
+    """Translate a typed tool value while retaining an explicit fallback for new provider states."""
+    normalized = value.strip().casefold().replace("_", " ")
+    translations = SUPPORT_VALUE_TRANSLATIONS[category].get(normalized)
+    return translations[language] if translations is not None else normalized

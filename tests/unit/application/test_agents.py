@@ -157,6 +157,18 @@ async def test_support_agent_combines_transaction_tools() -> None:
 
 
 @pytest.mark.asyncio
+async def test_support_agent_localizes_transaction_states_in_portuguese() -> None:
+    result = await build_support_agent().handle(
+        "Qual o status da minha última venda e da liquidação?", "cliente1988"
+    )
+
+    assert "cadastro do cliente: ativo" in result.answer
+    assert "venda mais recente está aprovada" in result.answer
+    assert "liquidação está agendada" in result.answer
+    assert all(value not in result.answer for value in ("active", "approved", "scheduled"))
+
+
+@pytest.mark.asyncio
 async def test_support_agent_combines_terminal_tools() -> None:
     result = await build_support_agent().handle(
         "My card machine won't connect to the internet", "cliente1988"
@@ -165,6 +177,18 @@ async def test_support_agent_combines_terminal_tools() -> None:
     assert result.agent is AgentName.SUPPORT
     assert "GET-12345" in result.answer
     assert "disconnected" in result.answer
+
+
+@pytest.mark.asyncio
+async def test_support_agent_localizes_terminal_states_in_portuguese() -> None:
+    result = await build_support_agent().handle(
+        "Minha maquininha não conecta na internet", "cliente1988"
+    )
+
+    assert "conectividade do terminal GET-12345 está desconectada" in result.answer
+    assert "sessão de dados móveis está sem conexão" in result.answer
+    assert "disconnected" not in result.answer
+    assert "mobile data session" not in result.answer
 
 
 @pytest.mark.asyncio
