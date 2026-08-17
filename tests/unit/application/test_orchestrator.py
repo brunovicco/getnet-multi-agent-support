@@ -54,6 +54,7 @@ def build_orchestrator(events: RecordingEvents) -> SupportOrchestrator:
             AgentName.SUPPORT,
             RouteName.CUSTOMER_TOOLS,
         ),
+        ("What is the capital of Argentina?", AgentName.KNOWLEDGE, RouteName.WEB_SEARCH),
         ("Tell me a secret", AgentName.ESCALATION, RouteName.HUMAN_HANDOFF),
     ],
 )

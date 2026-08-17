@@ -107,6 +107,23 @@ def test_chat_routes_support_request() -> None:
     assert len(body["trace_id"]) == 32
 
 
+def test_chat_routes_general_information_to_web_search() -> None:
+    with TestClient(create_app(Settings())) as client:
+        response = client.post(
+            "/chat",
+            json={
+                "message": "What is the capital of Argentina?",
+                "user_id": "cliente1988",
+            },
+        )
+
+    body = response.json()
+    assert response.status_code == 200
+    assert body["agent"] == "knowledge"
+    assert body["route"] == "web_search"
+    assert "requires a configured provider" in body["answer"]
+
+
 def test_chat_validates_empty_message() -> None:
     with TestClient(create_app(Settings())) as client:
         response = client.post("/chat", json={"message": "", "user_id": "cliente1988"})

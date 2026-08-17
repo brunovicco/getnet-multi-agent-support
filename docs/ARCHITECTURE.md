@@ -2,7 +2,7 @@
 
 ## Context
 
-The service answers public Getnet product questions, current general-information questions, and a
+The service answers public Getnet product questions, general-information questions, and a
 small set of authenticated customer-support diagnostics. Its current downstreams are a persisted
 local Getnet index, optional Tavily search, optional OpenAI Responses generation, and a fake
 customer repository. Production adapters would replace the fake CRM, payments, settlement, and

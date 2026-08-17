@@ -60,7 +60,8 @@ can be replaced incrementally if workflow durability becomes a real requirement.
    rules. Sensitive or unsupported actions have guardrail priority.
 3. The orchestrator records the route, reason, and confidence. Confidence below `0.60` is handed
    to `EscalationAgent`.
-4. `KnowledgeAgent` chooses local Getnet RAG or the current-information search port.
+4. `KnowledgeAgent` uses local RAG for Getnet product questions and the web-search port for
+   general-purpose or time-sensitive questions.
 5. `CustomerSupportAgent` reads account facts only through customer-scoped typed tools.
 6. The selected agent returns a normalized result with route, sources, handoff state, and tool
    counts. The API adds the trace ID and routing confidence.
@@ -77,11 +78,12 @@ contract, with these rules retained as the no-credential fallback.
 
 ### KnowledgeAgent
 
-Separates Getnet product knowledge from time-sensitive general information. Getnet questions use
-the local TF-IDF retriever and return only evidence-backed text plus official source URLs. Weather,
-exchange-rate, and other current questions use `WebSearchPort`. The concrete Tavily adapter calls
-the Search API when configured; otherwise it reports that current information is unavailable
-instead of fabricating a result.
+Separates Getnet product knowledge from general information. Getnet product questions use the
+local TF-IDF retriever and return only evidence-backed text plus official source URLs. General
+questions, including but not limited to weather and exchange rates, use `WebSearchPort`.
+Time-sensitive signals take precedence over product signals, so current Getnet questions also use
+web search. The concrete Tavily adapter calls the Search API when configured; otherwise it reports
+that external information is unavailable instead of fabricating a result.
 
 ### CustomerSupportAgent
 
@@ -266,7 +268,7 @@ uv run pytest
 uv run python scripts/quality_gate.py
 ```
 
-Tests cover routing, accent normalization, Getnet versus current knowledge, local retrieval,
+Tests cover routing, accent normalization, Getnet versus general web knowledge, local retrieval,
 corpus validation, Tavily and OpenAI HTTP contracts, provider failure fallbacks, customer lookup,
 cross-customer transaction isolation, terminal ownership, unknown-user handoff, all three
 orchestration branches, input validation, `/health`, and `/chat`. The integration suite exercises

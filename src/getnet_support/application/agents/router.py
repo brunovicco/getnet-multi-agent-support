@@ -31,6 +31,46 @@ class IntentRule:
         return any(f" {normalize_text(phrase)} " in padded for phrase in self.phrases)
 
 
+GETNET_PRODUCT_SIGNALS = (
+    "getnet",
+    "get classica",
+    "get smart",
+    "get mini",
+    "payment link",
+    "link de pagamento",
+    "get tap",
+    "pix",
+    "crediario",
+    "receivables advance",
+    "antecipacao",
+    "card machine",
+    "maquina de cartao",
+    "maquininha",
+)
+
+GENERAL_INFORMATION_SIGNALS = (
+    "what is",
+    "what are",
+    "what's the difference",
+    "who is",
+    "where is",
+    "when is",
+    "why is",
+    "which",
+    "how does",
+    "how do",
+    "can i",
+    "do i need",
+    "qual e",
+    "quais sao",
+    "quem e",
+    "onde fica",
+    "quando e",
+    "por que",
+    "como funciona",
+)
+
+
 ROUTING_RULES: tuple[IntentRule, ...] = (
     IntentRule(
         "sensitive-data",
@@ -101,26 +141,13 @@ ROUTING_RULES: tuple[IntentRule, ...] = (
     IntentRule(
         "getnet-product",
         AgentName.KNOWLEDGE,
-        (
-            "getnet",
-            "get classica",
-            "get smart",
-            "get mini",
-            "payment link",
-            "link de pagamento",
-            "get tap",
-            "pix",
-            "crediario",
-            "receivables advance",
-            "antecipacao",
-            "maquininha",
-        ),
+        GETNET_PRODUCT_SIGNALS,
         0.8,
     ),
     IntentRule(
         "informational-question",
         AgentName.KNOWLEDGE,
-        ("what is", "how does", "what's the difference", "can i", "do i need", "como funciona"),
+        GENERAL_INFORMATION_SIGNALS,
         0.2,
     ),
 )

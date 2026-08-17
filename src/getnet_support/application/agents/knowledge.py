@@ -1,6 +1,6 @@
-"""Grounded product knowledge and current-information agent."""
+"""Grounded Getnet product knowledge and general-information agent."""
 
-from getnet_support.application.agents.router import normalize_text
+from getnet_support.application.agents.router import GETNET_PRODUCT_SIGNALS, normalize_text
 from getnet_support.application.ports import (
     AnswerGeneratorPort,
     GetnetKnowledgePort,
@@ -23,7 +23,7 @@ MINIMUM_RETRIEVAL_SCORE = 0.08
 
 
 class KnowledgeAgent:
-    """Select Getnet RAG or current web search, then require grounding."""
+    """Select Getnet RAG or general web search, then require grounding."""
 
     def __init__(
         self,
@@ -38,7 +38,7 @@ class KnowledgeAgent:
 
     async def handle(self, message: str) -> AgentResult:
         """Answer from evidence or safely request human help."""
-        if self._requires_current_information(message):
+        if self._requires_web_search(message):
             result = await self._web_search.search(message)
             if not result.available:
                 return AgentResult(
@@ -73,9 +73,9 @@ class KnowledgeAgent:
                 tool_calls=1,
             )
 
-        # The tiny offline corpus keeps one self-contained chunk per product topic. Retrieval is
-        # top-k for observability/evaluation, while generation uses the strongest chunk to avoid
-        # diluting a focused answer with merely lexical secondary matches.
+        # The reviewed corpus keeps one self-contained chunk per product topic. Retrieval is top-k
+        # for observability/evaluation, while generation uses the strongest chunk to avoid diluting
+        # a focused answer with merely lexical secondary matches.
         relevant = candidates[:1]
         sources = self._unique_sources(relevant)
         evidence = " ".join(match.chunk.text.strip() for match in relevant)
@@ -94,12 +94,17 @@ class KnowledgeAgent:
         )
 
     @staticmethod
-    def _requires_current_information(message: str) -> bool:
+    def _requires_web_search(message: str) -> bool:
+        """Use web search for general questions and time-sensitive Getnet questions."""
         normalized = normalize_text(message)
         padded = f" {normalized} "
-        return any(
+        requires_current_information = any(
             f" {normalize_text(signal)} " in padded for signal in CURRENT_INFORMATION_SIGNALS
         )
+        references_getnet_product = any(
+            f" {normalize_text(signal)} " in padded for signal in GETNET_PRODUCT_SIGNALS
+        )
+        return requires_current_information or not references_getnet_product
 
     @staticmethod
     def _unique_sources(matches: tuple[RetrievedChunk, ...]) -> tuple[Source, ...]:

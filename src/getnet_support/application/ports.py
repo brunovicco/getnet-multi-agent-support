@@ -22,7 +22,7 @@ class GetnetKnowledgePort(Protocol):
 
 
 class WebSearchPort(Protocol):
-    """Search a provider for current general information."""
+    """Search a provider for general information outside the Getnet corpus."""
 
     async def search(self, query: str) -> WebSearchResult:
         """Return a grounded answer, or an explicit unavailable result."""

@@ -9,7 +9,13 @@ from getnet_support.adapters.tools.transactions import RecentTransactionsTool
 from getnet_support.adapters.tools.web_search import WebSearchTool
 from getnet_support.application.agents.customer_support import CustomerSupportAgent
 from getnet_support.application.agents.knowledge import KnowledgeAgent
-from getnet_support.domain.models import AgentName, RetrievedChunk, RouteName
+from getnet_support.domain.models import (
+    AgentName,
+    RetrievedChunk,
+    RouteName,
+    Source,
+    WebSearchResult,
+)
 
 
 class StubAnswerGenerator:
@@ -20,6 +26,19 @@ class StubAnswerGenerator:
         assert query
         assert evidence
         return self._answer
+
+
+class StubWebSearch:
+    def __init__(self) -> None:
+        self.queries: list[str] = []
+
+    async def search(self, query: str) -> WebSearchResult:
+        self.queries.append(query)
+        return WebSearchResult(
+            answer="Grounded web answer.",
+            sources=(Source(title="Reference", url="https://example.test/argentina"),),
+            available=True,
+        )
 
 
 def build_support_agent() -> CustomerSupportAgent:
@@ -67,6 +86,30 @@ async def test_knowledge_agent_degrades_without_web_provider() -> None:
     assert result.route is RouteName.WEB_SEARCH
     assert result.sources == ()
     assert "requires a configured" in result.answer
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "message",
+    [
+        "What is the capital of Argentina?",
+        "Qual é a capital da Argentina?",
+        "What is Getnet's stock price today?",
+    ],
+)
+async def test_knowledge_agent_uses_web_for_general_or_current_questions(
+    message: str,
+) -> None:
+    web_search = StubWebSearch()
+    agent = KnowledgeAgent(LocalTfidfRetriever(DEFAULT_GETNET_CORPUS), web_search)
+
+    result = await agent.handle(message)
+
+    assert result.agent is AgentName.KNOWLEDGE
+    assert result.route is RouteName.WEB_SEARCH
+    assert result.answer == "Grounded web answer."
+    assert result.sources[0].url == "https://example.test/argentina"
+    assert web_search.queries == [message]
 
 
 @pytest.mark.asyncio
